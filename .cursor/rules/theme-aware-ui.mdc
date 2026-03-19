@@ -1,0 +1,50 @@
+---
+description: All UI must be theme-aware and respect the user's light/dark theme choice
+globs: "**/*.vue, src/style.css"
+alwaysApply: false
+---
+
+# Theme-Aware UI
+
+Every visible element (text, labels, backgrounds, borders, inputs, buttons) must work in **both** light and dark modes. The app toggles theme via a `dark` class on `html`; Tailwind’s `dark:` variants apply in dark mode.
+
+## Prefer shared classes (src/style.css)
+
+Use these instead of inline theme styles when possible:
+
+- **Containers:** `card` or `card-elevated`
+- **Form controls:** `input-field`; labels in a `.form-row` get theme-aware label styles
+- **Buttons:** `btn-primary`, `btn-ghost`, `btn-secondary`, `btn-danger`
+
+## When using raw Tailwind, always pair light + dark
+
+Never use only dark-only classes (e.g. `text-white`, `bg-white/10`, `ring-white/20`) without a light-mode base.
+
+| Purpose | Light base | Dark variant |
+|--------|------------|--------------|
+| Headings / primary text | `text-gray-900` | `dark:text-white` |
+| Body / secondary text | `text-gray-600` or `text-gray-700` | `dark:text-white/70` or `dark:text-white/90` |
+| Muted / captions | `text-gray-500` | `dark:text-white/60` |
+| Backgrounds (cards, panels) | `bg-gray-100` or `bg-gray-200` | `dark:bg-white/5` or `dark:bg-white/10` |
+| Rings / borders | `ring-gray-200` / `border-gray-200` | `dark:ring-white/20` / `dark:border-white/20` |
+| Placeholders | `placeholder-gray-500` | `dark:placeholder-white/60` |
+
+**Exception:** Leave `text-white` on solid primary/danger buttons (e.g. `bg-primary-600 text-white`, `bg-blue-600 text-white`).
+
+## Examples
+
+```html
+<!-- ❌ BAD: dark-only, invisible in light mode -->
+<p class="text-white/80">Description</p>
+<div class="bg-white/5 ring-1 ring-white/20 p-4">...</div>
+<input class="bg-white/10 border border-white/20 text-white" />
+
+<!-- ✅ GOOD: theme-aware -->
+<p class="text-gray-600 dark:text-white/80">Description</p>
+<div class="bg-gray-100 dark:bg-white/5 ring-1 ring-gray-200 dark:ring-white/20 p-4">...</div>
+<input class="input-field" />
+```
+
+## Dynamic / JS class strings
+
+When building classes in JS (e.g. status badges, `getStatusClass()`), return strings that include both light and dark variants (e.g. `'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-white/70'`).

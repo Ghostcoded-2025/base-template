@@ -3,8 +3,11 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import { initTheme } from '@/composables/useTheme'
 import App from './App.vue'
 import router from './router'
+
+initTheme()
 
 const app = createApp(App)
 

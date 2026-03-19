@@ -3,8 +3,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI, organizationAPI } from '@/lib/supabase'
 import { isAppDomain, isOrganizationSubdomain, getSubdomainFromUrl, getOrganizationUrl, getBaseDomain, isLocalEnvironment } from '@/utils/domain'
+import { useTheme } from '@/composables/useTheme'
 
 const router = useRouter()
+const { isDark, toggleTheme } = useTheme()
 
 const email = ref('')
 const password = ref('')
@@ -117,7 +119,22 @@ const goToRegister = () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8 relative">
+    <!-- Theme toggle -->
+    <button
+      type="button"
+      @click="toggleTheme"
+      class="absolute top-4 right-4 p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-colors"
+      :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <svg v-if="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+      </svg>
+      <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+      </svg>
+    </button>
+
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
