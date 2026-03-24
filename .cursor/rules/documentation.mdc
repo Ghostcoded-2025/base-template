@@ -12,7 +12,7 @@ alwaysApply: true
 
 ### How to write `docs/`
 
-- **Why**: Durable context for **agents**; humans approve what is recorded. Document **decisions and hard constraints** an agent would not reliably infer from code or remember long-term—not tutorials, onboarding stories, or facts obvious from the repository.
+- **Why**: Durable context for **agents**; humans approve what is recorded. Document **decisions and hard constraints** an agent would not reliably infer from code or remember long-term—not tutorials, onboarding stories, or **mirrors of repo structure** (routes, inventories of files or folders, etc.); those stay in code. Capture what the code does **not** spell out.
 - **Form**: **Tight and skimmable**—bullets, tables, minimal prose. **One fact, one owner**; in another doc, **link** to the owner instead of repeating.
 - **Openings**: Describe **what the file contains**. Do **not** catalog everything the file omits; only call out a **clear exception** when a boundary would otherwise blur (e.g. where authorization trust vs architecture lives).
 - **`docs/documentation.md`**: **Meta only**—why docs exist, full file index, inventory rule, maintenance. **Do not** put product or stack substance there unless it is about the doc system itself (substantive workflows belong in topic docs).

@@ -1,6 +1,8 @@
 # Architecture
 
-Layers and **where work runs** (browser client vs server). **Trust / authorization**: `docs/security.md`. **Vue/Pinia/router/libs**: `docs/frontend-conventions.md`. **RLS, RBAC, aliases**: `docs/database.md`.
+Wiring between **layers**, **where work runs** (browser client vs server), and integration boundaries—at that level of abstraction, with **pointers** to topic docs instead of restating structure that already lives in the repo.
+
+**Trust / authorization**: `docs/security.md`. **Vue/Pinia/router/libs**: `docs/frontend-conventions.md`. **RLS, RBAC, aliases**: `docs/database.md`.
 
 ## Layer diagram
 
@@ -35,8 +37,8 @@ flowchart TB
   L --> EF
 ```
 
-- **`src/views/`** — Route-level UI; keep thin. **`InstallAppView.vue`** — public PWA install help (`/install-app`); see **`docs/frontend-conventions.md`**.
-- **`src/router/`** — Routes and `meta` only.
+- **`src/views/`** — Route-level UI; keep thin. Public vs authenticated flows and route-level UI conventions → **`docs/frontend-conventions.md`**.
+- **`src/router/`** — Route table, `meta`, and global navigation guards (`beforeEach`).
 - **`src/App.vue`** — Layout; authenticated session lifecycle (bootstrap / clear) lives here—details in `docs/frontend-conventions.md`.
 - **`src/lib/`** — Shared integrations: `supabase.ts`, `auth.ts`, `profile.ts`, `admin.ts`, `pwa.ts`.
 - **`src/types/`** — `supabase.ts` generated (do not hand-edit); `database.ts` app aliases—see `docs/database.md`.

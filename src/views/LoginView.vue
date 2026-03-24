@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI } from '@/lib/auth'
 
@@ -9,13 +9,6 @@ const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
 const error = ref('')
-
-onMounted(async () => {
-  const { data } = await authAPI.getCurrentUser()
-  if (data.user) {
-    void router.push('/dashboard')
-  }
-})
 
 const handleLogin = async () => {
   isLoading.value = true

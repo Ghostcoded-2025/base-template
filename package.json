@@ -13,7 +13,10 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --max-warnings 0",
-    "db:types": "npx supabase gen types typescript --project-id xdgiftvbsdhhzvcjoeft --schema public > src/types/supabase.ts"
+    "lint:check": "eslint . --max-warnings 0",
+    "verify": "npm run lint:check && npm run build",
+    "db:types": "npx supabase gen types typescript --project-id xdgiftvbsdhhzvcjoeft --schema public > src/types/supabase.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
@@ -35,6 +38,7 @@
     "baseline-browser-mapping": "^2.8.32",
     "eslint": "^9.31.0",
     "eslint-plugin-vue": "~10.3.0",
+    "husky": "^9.1.7",
     "jiti": "^2.4.2",
     "npm-run-all2": "^8.0.4",
     "postcss": "^8.5.6",

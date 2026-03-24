@@ -4,7 +4,7 @@
 
 **Pinia**: **Setup stores** only — `defineStore('id', () => { … })`, `ref` / `computed`, functions, single `return { … }`. In components: **`storeToRefs(store)`** for reactive state/getters; call **actions** on the store instance.
 
-**Router**: `RouteRecordRaw[]`, lazy views `() => import('…')`, extend **`RouteMeta`** in `env.d.ts` for new `meta` (e.g. `requiresAdmin`).
+**Router**: `RouteRecordRaw[]`, lazy views `() => import('…')`, extend **`RouteMeta`** in `env.d.ts` for new `meta` (e.g. `requiresAdmin`). Global **`beforeEach`**: authenticated users hitting **`/`**, **`/login`**, or **`/register`** are redirected to **`/dashboard`** (via `authAPI.getCurrentUser()`); **`/install-app`** stays public for everyone. When auth changes **without** a navigation (Supabase listener), **`App.vue`** calls **`replaceWithDashboardIfOnGuestAuthPath`** from **`src/router/index.ts`** so the URL stays aligned with the session.
 
 **Entry**: `createApp`, `createPinia`, `app.use(router)`.
 
@@ -18,4 +18,4 @@
 
 **Styling**: Tailwind. Theme, layout widths, and reusable class patterns → **`docs/styling.md`**.
 
-**PWA**: Manifest-only (no service worker). `public/manifest.webmanifest`, icons in `public/`, linked from `index.html`. Public route **`/install-app`** (`InstallAppView.vue`) — UA-based install steps, optional manual scenario, standalone banner, Chromium `beforeinstallprompt` when available, **Back** + MDN manifest link + **`siteOrigin`** in copy; instruction screenshots under **`src/assets/`** (`chrome-install-icon.png`, `edge-install-icon.png`, `ios-*.png`); **Font Awesome** `ellipsis-vertical` in Android/Edge steps. Netlify: `Content-Type: application/manifest+json` for `/manifest.webmanifest` in `netlify.toml`.
+**PWA**: Manifest-only (no service worker). `public/manifest.webmanifest`, icons in `public/`, linked from `index.html`. **Install-app and marketing/auth URLs**: add **`/install-app`** to the **`beforeEach`** branch that returns `true` without auth; for new **guest-only** pages that signed-in users should not stay on, add the path to **`guestPathsRedirectWhenAuthenticated`** in **`router/index.ts`** (same set **`replaceWithDashboardIfOnGuestAuthPath`** uses). Install view: UA-based install steps, optional manual scenario, standalone banner, Chromium `beforeinstallprompt` when available, **Back** + MDN manifest link + **`siteOrigin`** in copy; instruction screenshots under **`src/assets/`** (`chrome-install-icon.png`, `edge-install-icon.png`, `ios-*.png`); **Font Awesome** `ellipsis-vertical` in Android/Edge steps. Netlify: `Content-Type: application/manifest+json` for `/manifest.webmanifest` in `netlify.toml`.

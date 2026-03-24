@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { authAPI } from '@/lib/auth'
+import { replaceWithDashboardIfOnGuestAuthPath } from '@/router'
 import { isRunningAsInstalledPwa } from '@/lib/pwa'
 import { useAccountStore } from '@/stores/account'
 import { useSessionStore } from '@/stores/session'
@@ -44,9 +45,7 @@ async function applyAuthFromUser() {
 
   if (sessionStore.isAuthenticated) {
     await bootstrapAuthenticated()
-    if (isLoginPage.value || isRegisterPage.value) {
-      void router.push('/dashboard')
-    }
+    replaceWithDashboardIfOnGuestAuthPath(router)
   } else {
     clearAuthenticatedState()
   }
@@ -76,9 +75,7 @@ onMounted(async () => {
     }
 
     void bootstrapAuthenticated().then(() => {
-      if (isLoginPage.value || isRegisterPage.value) {
-        void router.push('/dashboard')
-      }
+      replaceWithDashboardIfOnGuestAuthPath(router)
     })
   })
   onUnmounted(() => {
@@ -91,7 +88,7 @@ const handleSignOut = async () => {
     const { error } = await authAPI.signOut()
     if (error) throw error
     clearAuthenticatedState()
-    void router.push('/login')
+    void router.push('/')
   } catch (e) {
     console.error('Error signing out:', e)
   }
