@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      profile_roles: {
+        Row: {
+          created_at: string
+          profile_id: string
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          profile_id: string
+          role_id: string
+        }
+        Update: {
+          created_at?: string
+          profile_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_roles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -35,12 +68,30 @@ export type Database = {
         }
         Relationships: []
       }
+      roles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_user_has_role: { Args: { role_name: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

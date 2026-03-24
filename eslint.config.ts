@@ -27,6 +27,7 @@ export default defineConfigWithVueTs(
     '**/dist-ssr/**',
     '**/coverage/**',
     '**/src/types/supabase.ts',
+    '**/supabase/functions/**',
   ]),
 
   pluginVue.configs['flat/recommended'],

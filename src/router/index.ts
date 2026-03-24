@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import { profileAPI } from '@/lib/profile'
 import { authAPI } from '@/lib/supabase'
 
 const router = createRouter({
@@ -26,6 +27,18 @@ const router = createRouter({
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminDashboardView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/admin-management',
+      name: 'admin-management',
+      component: () => import('../views/AdminAdminsView.vue'),
+      meta: { requiresSuperAdmin: true },
+    },
   ],
 })
 
@@ -40,6 +53,20 @@ router.beforeEach(async (to) => {
     if (!data.user) {
       return '/login'
     }
+
+    if (to.meta.requiresSuperAdmin) {
+      const allowed = await profileAPI.hasRole('super_admin')
+      if (!allowed) {
+        return '/admin'
+      }
+    } else if (to.meta.requiresAdmin) {
+      const isAdmin = await profileAPI.hasRole('admin')
+      const isSuper = await profileAPI.hasRole('super_admin')
+      if (!isAdmin && !isSuper) {
+        return '/dashboard'
+      }
+    }
+
     return true
   } catch {
     return '/login'

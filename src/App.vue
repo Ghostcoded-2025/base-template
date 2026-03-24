@@ -1,32 +1,57 @@
 <script setup lang="ts">
 import { RouterView, useRouter } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { authAPI } from '@/lib/supabase'
+import { profileAPI } from '@/lib/profile'
+import { authAPI, supabase } from '@/lib/supabase'
 
 const route = useRoute()
 const router = useRouter()
 
 const isAuthenticated = ref(false)
 const isLoading = ref(true)
+const isAdminUser = ref(false)
 
 const isLoginPage = computed(() => route.path === '/login')
 const isRegisterPage = computed(() => route.path === '/register')
 
-onMounted(async () => {
+async function refreshSessionAndRoles() {
   try {
     const { data, error } = await authAPI.getCurrentUser()
     const user = data.user
     isAuthenticated.value = !!user && !error
+
+    if (isAuthenticated.value) {
+      const [adminRole, superRole] = await Promise.all([
+        profileAPI.hasRole('admin'),
+        profileAPI.hasRole('super_admin'),
+      ])
+      isAdminUser.value = adminRole || superRole
+    } else {
+      isAdminUser.value = false
+    }
 
     if (isAuthenticated.value && (isLoginPage.value || isRegisterPage.value)) {
       void router.push('/dashboard')
     }
   } catch (e) {
     console.error('Error checking authentication:', e)
-  } finally {
-    isLoading.value = false
+    isAdminUser.value = false
   }
+}
+
+onMounted(async () => {
+  await refreshSessionAndRoles()
+  isLoading.value = false
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(() => {
+    void refreshSessionAndRoles()
+  })
+  onUnmounted(() => {
+    subscription.unsubscribe()
+  })
 })
 
 const handleSignOut = async () => {
@@ -69,6 +94,13 @@ const handleSignOut = async () => {
               class="text-gray-600 hover:text-gray-900"
             >
               Dashboard
+            </router-link>
+            <router-link
+              v-if="isAdminUser"
+              to="/admin"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              Admin
             </router-link>
             <button
               type="button"
