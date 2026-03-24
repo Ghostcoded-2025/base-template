@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
+import type { Profile } from '@/types/database'
+import type { Database } from '@/types/supabase'
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
@@ -7,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -15,12 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 })
 
-export interface Profile {
-  id: string
-  full_name: string | null
-  created_at: string
-  updated_at: string
-}
+export type { Profile }
 
 export const authAPI = {
   async signUp(
@@ -71,7 +69,7 @@ export const userAPI = {
       .maybeSingle()
 
     return {
-      data: data as Profile | null,
+      data,
       error: error as Error | null,
     }
   },

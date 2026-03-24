@@ -22,7 +22,12 @@ export default defineConfigWithVueTs(
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  globalIgnores([
+    '**/dist/**',
+    '**/dist-ssr/**',
+    '**/coverage/**',
+    '**/src/types/supabase.ts',
+  ]),
 
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.strictTypeChecked,

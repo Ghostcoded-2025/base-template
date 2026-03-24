@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "eslint . --fix --max-warnings 0"
+    "lint": "eslint . --fix --max-warnings 0",
+    "db:types": "npx supabase gen types typescript --project-id xdgiftvbsdhhzvcjoeft --schema public > src/types/supabase.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
