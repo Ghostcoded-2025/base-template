@@ -1,0 +1,9 @@
+---
+description: Agents use docs/documentation.md; update listed docs in the same change as code
+alwaysApply: true
+---
+
+## Documentation
+
+- **Substance** in **`docs/`**; **index and inventory**: **`docs/documentation.md`**. One fact, one owner—do not paste long guidance into rules. New always-on agent constraints belong in **`.cursor/rules/`** as short pointers only when they cannot live in `docs/`.
+- **Same change as code**: If you change behavior that is documented in any file listed in **`docs/documentation.md`**, **update that doc in the same change** (use the index row to pick the file).
