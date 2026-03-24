@@ -8,12 +8,14 @@
 
 **Entry**: `createApp`, `createPinia`, `app.use(router)`.
 
-**`src/lib/`**: `supabase.ts` (client), `auth.ts` (session + guards), `profile.ts` (reads, role RPCs), `admin.ts` (Edge Function HTTP). Owner **`profiles`** writes that must stay aligned with Pinia → **`useAccountStore`** actions, not `profileAPI`.
+**`src/lib/`**: `supabase.ts` (client), `auth.ts` (session + guards), `profile.ts` (reads, owner `profiles` updates, role RPCs), `admin.ts` (Edge Function HTTP), `pwa.ts` (`isRunningAsInstalledPwa` — detects installed PWA vs browser tab).
 
-**Stores**: **`useSessionStore`** — auth snapshot, admin flags, `rolesLoaded`; **`profileAPI` only** (no direct `supabase` for profile writes). **`useAccountStore`** — profile row; reads via `profileAPI`; owner `profiles` updates via **`supabase`** only when followed immediately by **`refreshProfile()`** (e.g. `updateFullName`).
+**Stores**: **`useSessionStore`** — auth snapshot, admin flags, `rolesLoaded`; **`profileAPI` / `authAPI` only** (no direct `supabase`). **`useAccountStore`** — profile row; **`profileAPI`** for reads and owner updates; actions call **`refreshProfile()`** after successful mutations (e.g. `updateFullName`).
 
-**`App.vue`**: `bootstrapAuthenticated` / `clearAuthenticatedState` on sign-in/out; **`TOKEN_REFRESHED`** → refresh **profile only** (not roles). Guards: `authAPI` + `profileAPI.hasRole` (not Pinia). Trust: `docs/security.md`.
+**`App.vue`**: `bootstrapAuthenticated` / `clearAuthenticatedState` on sign-in/out; **`TOKEN_REFRESHED`** → refresh **profile only** (not roles). Guards: `authAPI` + `profileAPI.hasRole` (not Pinia). Trust: `docs/security.md`. **Install app** nav link is hidden when `isRunningAsInstalledPwa()` (`lib/pwa.ts`) is true.
 
 **Freshness** (after a **successful** mutation): `profiles` → `useAccountStore().refreshProfile()` or `updateFullName()`; own `profile_roles` → `useSessionStore().loadRoles()`; both → `Promise.all([refreshProfile(), loadRoles()])`. Mutations on **other** users’ roles → no session refresh. Sign-in/out bootstrap does **not** replace these after unrelated mutations.
 
-**Styling**: Tailwind.
+**Styling**: Tailwind. Theme, layout widths, and reusable class patterns → **`docs/styling.md`**.
+
+**PWA**: Manifest-only (no service worker). `public/manifest.webmanifest`, icons in `public/`, linked from `index.html`. Public route **`/install-app`** (`InstallAppView.vue`) — UA-based install steps, optional manual scenario, standalone banner, Chromium `beforeinstallprompt` when available, **Back** + MDN manifest link + **`siteOrigin`** in copy; instruction screenshots under **`src/assets/`** (`chrome-install-icon.png`, `edge-install-icon.png`, `ios-*.png`); **Font Awesome** `ellipsis-vertical` in Android/Edge steps. Netlify: `Content-Type: application/manifest+json` for `/manifest.webmanifest` in `netlify.toml`.

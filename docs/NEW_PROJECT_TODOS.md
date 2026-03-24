@@ -9,6 +9,20 @@ After copying this template for a real app, update the following. Anything liste
 - `**src/App.vue**` — replace the nav label `App` with your app name.
 - **Search the repo** for any remaining “Base Template” or old template strings (there should be none after a fresh template pass).
 
+## PWA (manifest + install page)
+
+This template uses a **manifest-only** PWA (no service worker). When you ship a real product, replace or align the following.
+
+- **`public/manifest.webmanifest`** — Set `name`, `short_name`, and `description` to your product. Match `theme_color` and `background_color` to your brand (keep them in sync with `index.html` meta tile/theme colors). **`start_url`** and **`scope`** use `/`; if you deploy under a subpath, set Vite **`base`**, then update `start_url` / `scope` (and static asset paths) accordingly.
+- **`public/pwa-192.png`** and **`public/pwa-512.png`** — Replace the placeholder icons with your own **192×192** and **512×512** PNGs (required for install prompts on common browsers). Optionally add separate **maskable** icons and extra `icons[]` entries with `"purpose": "maskable"` (or `"any maskable"`).
+- **`index.html`** — `meta name="theme-color"`, `meta name="msapplication-TileColor"`, and `link rel="apple-touch-icon"` should match your manifest colors and touch icon asset (change `href` if you rename files).
+- **`src/views/InstallAppView.vue`** — Replace the hard-coded **“Base Template”** strings in headings and body copy with your product name. Step text uses the current **hostname** automatically where the old template used a fixed domain.
+- **Hosting** — **`netlify.toml`** already serves `/manifest.webmanifest` as `application/manifest+json`. On **another** host (Vercel, Cloudflare, nginx, etc.), configure the same MIME type for the manifest path.
+
+## Styling
+
+- **`docs/styling.md`** — replace or rewrite with **your** theme, layout choices, and component class recipes. The template file documents the starter look (Tailwind defaults, example patterns); a real product should own its own styling doc so reuse and agent context match your brand.
+
 ## Supabase CLI / local stack
 
 - `**supabase/config.toml`** — set `project_id` to a unique string per repo (helps distinguish local Supabase instances).

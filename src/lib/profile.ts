@@ -37,4 +37,29 @@ export const profileAPI = {
       error: error as Error | null,
     }
   },
+
+  async updateFullName(fullName: string): Promise<{
+    data: Profile | null
+    error: Error | null
+  }> {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return { data: null, error: userError ?? new Error('Not authenticated') }
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ full_name: fullName })
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    return {
+      data,
+      error: error as Error | null,
+    }
+  },
 }

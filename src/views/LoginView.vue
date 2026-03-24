@@ -111,6 +111,13 @@ const handleLogin = async () => {
         >
           Create an account
         </router-link>
+        <span class="mx-2 text-gray-400">·</span>
+        <router-link
+          to="/install-app"
+          class="underline"
+        >
+          Install app
+        </router-link>
       </p>
     </div>
   </div>

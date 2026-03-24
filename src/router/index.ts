@@ -26,6 +26,11 @@ const routes: RouteRecordRaw[] = [
     component: RegisterView,
   },
   {
+    path: '/install-app',
+    name: 'install-app',
+    component: () => import('../views/InstallAppView.vue'),
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     component: () => import('../views/DashboardView.vue'),
@@ -54,7 +59,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const publicRoutes = ['/login', '/register']
+  const publicRoutes = ['/login', '/register', '/install-app']
   if (publicRoutes.includes(to.path)) {
     return true
   }

@@ -1,9 +1,21 @@
 ---
-description: Agents use docs/documentation.md; update listed docs in the same change as code
+description: How to write docs; index at documentation.md; same-change updates
 alwaysApply: true
 ---
 
 ## Documentation
 
-- **Substance** in **`docs/`**; **index and inventory**: **`docs/documentation.md`**. One fact, one owner—do not paste long guidance into rules. New always-on agent constraints belong in **`.cursor/rules/`** as short pointers only when they cannot live in `docs/`.
-- **Same change as code**: If you change behavior that is documented in any file listed in **`docs/documentation.md`**, **update that doc in the same change** (use the index row to pick the file).
+### Using `docs/`
+
+- **Substance** in **`docs/`**; **index and inventory**: **`docs/documentation.md`**. **Types vs migrations** workflow: opening of **`docs/database.md`**.
+- **Same change as code**: If behavior documented in any file listed in **`docs/documentation.md`** changes, **update that doc in the same change** (pick the file using the index row).
+
+### How to write `docs/`
+
+- **Why**: Durable context for **agents**; humans approve what is recorded. Document **decisions and hard constraints** an agent would not reliably infer from code or remember long-term—not tutorials, onboarding stories, or facts obvious from the repository.
+- **Form**: **Tight and skimmable**—bullets, tables, minimal prose. **One fact, one owner**; in another doc, **link** to the owner instead of repeating.
+- **Openings**: Describe **what the file contains**. Do **not** catalog everything the file omits; only call out a **clear exception** when a boundary would otherwise blur (e.g. where authorization trust vs architecture lives).
+- **`docs/documentation.md`**: **Meta only**—why docs exist, full file index, inventory rule, maintenance. **Do not** put product or stack substance there unless it is about the doc system itself (substantive workflows belong in topic docs).
+- **Cross-links**: **`docs/` → `docs/`** is fine. **Never** reference **`.cursor/rules/`** from inside `docs/` (rules point at docs; readers of docs are not assumed to use Cursor).
+- **New file**: Any new **`docs/*.md`** → add a row to the table in **`docs/documentation.md`** in the **same change** (and extend inventory rules if layout changes, e.g. subfolders).
+- **Rules vs docs**: Keep **`.cursor/rules/`** short—pointers and constraints that cannot live in `docs/`. **Do not** copy long passages from `docs/` into rules.

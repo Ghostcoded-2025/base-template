@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import { profileAPI } from '@/lib/profile'
-import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/types/database'
 
 export const useAccountStore = defineStore('account', () => {
@@ -27,18 +26,7 @@ export const useAccountStore = defineStore('account', () => {
    * Updates the signed-in user’s `profiles.full_name` and reloads `profile` from the server.
    */
   async function updateFullName(fullName: string) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) throw new Error('Not authenticated')
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ full_name: fullName })
-      .eq('id', user.id)
-      .select()
-      .single()
-
+    const { data, error } = await profileAPI.updateFullName(fullName)
     if (error) {
       throw error
     }

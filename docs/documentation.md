@@ -14,5 +14,6 @@
 | **`docs/frontend-conventions.md`** | Vue, Pinia, router, `lib/` usage, stores, freshness, Tailwind. |
 | **`docs/NEW_PROJECT_TODOS.md`** | One-time checklist when cloning this template (not product canon). |
 | **`docs/security.md`** | Authorization vs UX; what may be treated as proof of privilege. |
+| **`docs/styling.md`** | Theme, layout widths, canonical Tailwind recipes; reuse vs extract component (≥3×). |
 
-**Maintenance**: Before work, read the row that matches the task. When code changes **documented behavior**, **update that doc in the same change**. One fact → one owner; if two apply, use the **narrower** doc (policy story → `security.md`; table policies → `database.md`; UI patterns → `frontend-conventions.md`). New topic → new file under `docs/` + add a row here.
+**Maintenance**: Before work, read the row that matches the task. When code changes **documented behavior**, **update that doc in the same change**. One fact → one owner; if two apply, use the **narrower** doc (policy story → `security.md`; table policies → `database.md`; Vue/router/Pinia → `frontend-conventions.md`; **look, feel, Tailwind recipes** → `styling.md`). New topic → new file under `docs/` + add a row here.

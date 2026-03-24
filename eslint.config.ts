@@ -33,4 +33,41 @@ export default defineConfigWithVueTs(
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.strictTypeChecked,
   vueTsConfigs.stylisticTypeChecked,
+
+  {
+    name: 'app/consistent-type-imports',
+    files: ['**/*.{ts,mts,tsx,vue}'],
+    rules: {
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
+      ],
+    },
+  },
+
+  // Keep `paths` allowlist aligned with docs/architecture.md (Supabase client boundary).
+  {
+    name: 'app/restrict-supabase-client-import',
+    files: ['src/**/*.{ts,vue}'],
+    ignores: [
+      'src/lib/supabase.ts',
+      'src/lib/auth.ts',
+      'src/lib/profile.ts',
+      'src/lib/admin.ts',
+    ],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/lib/supabase',
+              message:
+                'Import the Supabase client only from integration modules in src/lib/ (see docs/architecture.md).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 )

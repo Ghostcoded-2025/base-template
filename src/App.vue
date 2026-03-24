@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { authAPI } from '@/lib/auth'
+import { isRunningAsInstalledPwa } from '@/lib/pwa'
 import { useAccountStore } from '@/stores/account'
 import { useSessionStore } from '@/stores/session'
 
@@ -18,10 +19,11 @@ const isLoading = ref(true)
 
 const isLoginPage = computed(() => route.path === '/login')
 const isRegisterPage = computed(() => route.path === '/register')
-
 const showAdminNav = computed(
   () => rolesLoaded.value && canAccessAdmin.value
 )
+
+const showInstallNavLink = ref(!isRunningAsInstalledPwa())
 
 async function bootstrapAuthenticated() {
   await Promise.all([
@@ -125,6 +127,13 @@ const handleSignOut = async () => {
               class="text-gray-600 hover:text-gray-900"
             >
               Dashboard
+            </router-link>
+            <router-link
+              v-if="showInstallNavLink"
+              to="/install-app"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              Install app
             </router-link>
             <router-link
               v-if="showAdminNav"
