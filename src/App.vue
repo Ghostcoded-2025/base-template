@@ -1,53 +1,83 @@
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { profileAPI } from '@/lib/profile'
-import { authAPI, supabase } from '@/lib/supabase'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+
+import { authAPI } from '@/lib/auth'
+import { useAccountStore } from '@/stores/account'
+import { useSessionStore } from '@/stores/session'
 
 const route = useRoute()
 const router = useRouter()
+const sessionStore = useSessionStore()
+const accountStore = useAccountStore()
+const { isAuthenticated, rolesLoaded, canAccessAdmin } =
+  storeToRefs(sessionStore)
 
-const isAuthenticated = ref(false)
 const isLoading = ref(true)
-const isAdminUser = ref(false)
 
 const isLoginPage = computed(() => route.path === '/login')
 const isRegisterPage = computed(() => route.path === '/register')
 
-async function refreshSessionAndRoles() {
-  try {
-    const { data, error } = await authAPI.getCurrentUser()
-    const user = data.user
-    isAuthenticated.value = !!user && !error
+const showAdminNav = computed(
+  () => rolesLoaded.value && canAccessAdmin.value
+)
 
-    if (isAuthenticated.value) {
-      const [adminRole, superRole] = await Promise.all([
-        profileAPI.hasRole('admin'),
-        profileAPI.hasRole('super_admin'),
-      ])
-      isAdminUser.value = adminRole || superRole
-    } else {
-      isAdminUser.value = false
-    }
+async function bootstrapAuthenticated() {
+  await Promise.all([
+    accountStore.refreshProfile(),
+    sessionStore.loadRoles(),
+  ])
+}
 
-    if (isAuthenticated.value && (isLoginPage.value || isRegisterPage.value)) {
+function clearAuthenticatedState() {
+  sessionStore.clear()
+  accountStore.clear()
+}
+
+async function applyAuthFromUser() {
+  const { data, error } = await authAPI.getCurrentUser()
+  const user = data.user
+  sessionStore.setFromAuthUser(user && !error ? user : null)
+
+  if (sessionStore.isAuthenticated) {
+    await bootstrapAuthenticated()
+    if (isLoginPage.value || isRegisterPage.value) {
       void router.push('/dashboard')
     }
-  } catch (e) {
-    console.error('Error checking authentication:', e)
-    isAdminUser.value = false
+  } else {
+    clearAuthenticatedState()
   }
 }
 
 onMounted(async () => {
-  await refreshSessionAndRoles()
+  await applyAuthFromUser()
   isLoading.value = false
 
   const {
     data: { subscription },
-  } = supabase.auth.onAuthStateChange(() => {
-    void refreshSessionAndRoles()
+  } = authAPI.onAuthStateChange((event, session) => {
+    sessionStore.setFromAuthUser(session?.user ?? null)
+
+    if (!session?.user) {
+      clearAuthenticatedState()
+      return
+    }
+
+    if (event === 'TOKEN_REFRESHED') {
+      void accountStore.refreshProfile()
+      return
+    }
+
+    if (event === 'INITIAL_SESSION') {
+      return
+    }
+
+    void bootstrapAuthenticated().then(() => {
+      if (isLoginPage.value || isRegisterPage.value) {
+        void router.push('/dashboard')
+      }
+    })
   })
   onUnmounted(() => {
     subscription.unsubscribe()
@@ -58,6 +88,7 @@ const handleSignOut = async () => {
   try {
     const { error } = await authAPI.signOut()
     if (error) throw error
+    clearAuthenticatedState()
     void router.push('/login')
   } catch (e) {
     console.error('Error signing out:', e)
@@ -96,7 +127,7 @@ const handleSignOut = async () => {
               Dashboard
             </router-link>
             <router-link
-              v-if="isAdminUser"
+              v-if="showAdminNav"
               to="/admin"
               class="text-gray-600 hover:text-gray-900"
             >

@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { profileAPI } from '@/lib/profile'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 
-const isSuperAdmin = ref(false)
-const isLoading = ref(true)
+import { useSessionStore } from '@/stores/session'
 
-onMounted(async () => {
-  try {
-    isSuperAdmin.value = await profileAPI.hasRole('super_admin')
-  } finally {
-    isLoading.value = false
-  }
-})
+const sessionStore = useSessionStore()
+const { isSuperAdmin, rolesLoaded } = storeToRefs(sessionStore)
+
+const isLoading = computed(() => !rolesLoaded.value)
 </script>
 
 <template>
@@ -33,7 +29,7 @@ onMounted(async () => {
     >
       <li v-if="isSuperAdmin">
         <router-link
-          to="/admin/admin-management"
+          to="/admin/management"
           class="text-indigo-600 hover:text-indigo-800"
         >
           Admin management

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { authAPI } from '@/lib/supabase'
+import { authAPI } from '@/lib/auth'
 
 const router = useRouter()
 

@@ -3,7 +3,8 @@ import { onMounted, ref } from 'vue'
 
 import AdminManagePermissionsModal from '@/components/AdminManagePermissionsModal.vue'
 import { adminAPI, type AdminUserRow } from '@/lib/admin'
-import { authAPI } from '@/lib/supabase'
+import { authAPI } from '@/lib/auth'
+import { useSessionStore } from '@/stores/session'
 
 const currentUserEmail = ref<string | null>(null)
 const users = ref<AdminUserRow[]>([])
@@ -15,6 +16,8 @@ const modalOpen = ref(false)
 const activeUser = ref<AdminUserRow | null>(null)
 const saveError = ref('')
 const isSaving = ref(false)
+
+const sessionStore = useSessionStore()
 
 async function load() {
   isLoading.value = true
@@ -54,6 +57,10 @@ async function onSave(email: string, roles: string[]) {
   isSaving.value = true
   try {
     await adminAPI.setUserRoles(email, roles)
+    const selfEmail = currentUserEmail.value?.toLowerCase() ?? ''
+    if (selfEmail.length > 0 && email.toLowerCase() === selfEmail) {
+      await sessionStore.loadRoles()
+    }
     closeModal()
     await load()
   } catch (e) {
@@ -88,11 +95,11 @@ function isCurrentUserRow(u: AdminUserRow): boolean {
     <div class="mt-6 flex flex-wrap items-end gap-3">
       <div>
         <label
-          for="admin-search"
+          for="admin-management-search"
           class="block text-xs font-medium text-gray-600"
         >Search email</label>
         <input
-          id="admin-search"
+          id="admin-management-search"
           v-model="search"
           type="search"
           class="mt-1 w-56 rounded-md border border-gray-300 px-2 py-1.5 text-sm"

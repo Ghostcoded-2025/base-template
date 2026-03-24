@@ -1,32 +1,31 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { authAPI, userAPI } from '@/lib/supabase'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 
-const email = ref<string | null>(null)
-const fullName = ref<string | null>(null)
-const isLoading = ref(true)
-const loadError = ref('')
+import { useAccountStore } from '@/stores/account'
+import { useSessionStore } from '@/stores/session'
 
-onMounted(async () => {
-  try {
-    const { data: authData } = await authAPI.getCurrentUser()
-    if (!authData.user) {
-      loadError.value = 'Could not load session.'
-      return
-    }
-    email.value = authData.user.email ?? null
+const sessionStore = useSessionStore()
+const accountStore = useAccountStore()
+const { authUser } = storeToRefs(sessionStore)
+const { profile, profileLoading } = storeToRefs(accountStore)
 
-    const { data: profile, error: profileErr } = await userAPI.getProfile()
-    if (profileErr) {
-      loadError.value = profileErr.message || 'Could not load profile.'
-      return
-    }
-    fullName.value = profile?.full_name ?? null
-  } catch {
-    loadError.value = 'Something went wrong.'
-  } finally {
-    isLoading.value = false
+const email = computed(() => authUser.value?.email ?? null)
+const fullName = computed(() => profile.value?.full_name ?? null)
+
+const isLoading = computed(() => profileLoading.value)
+
+const loadError = computed(() => {
+  if (profileLoading.value) {
+    return ''
   }
+  if (!sessionStore.isAuthenticated) {
+    return 'Could not load session.'
+  }
+  if (!profile.value) {
+    return 'Could not load profile.'
+  }
+  return ''
 })
 </script>
 

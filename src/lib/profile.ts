@@ -1,3 +1,5 @@
+import type { Profile } from '@/types/database'
+
 import { supabase } from '@/lib/supabase'
 
 export const profileAPI = {
@@ -10,5 +12,29 @@ export const profileAPI = {
       return false
     }
     return data
+  },
+
+  async getCurrentProfile(): Promise<{
+    data: Profile | null
+    error: Error | null
+  }> {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return { data: null, error: userError ?? new Error('Not authenticated') }
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    return {
+      data,
+      error: error as Error | null,
+    }
   },
 }
