@@ -6,10 +6,8 @@ alwaysApply: true
 ## Database schema – AI-only guidance
 
 - **Schema source of truth**: Always use the Supabase‑generated types in `src/types/supabase.ts` for exact tables, columns, types, and enums. Do **not** infer schema from migrations, and do **not** edit `src/types/supabase.ts` directly (it is regenerated, e.g. via `npm run db:types`).
-- **Non-obvious database behavior**: Use `docs/database.md` for rules, relationships, and invariants that are **not** clear from `src/types/supabase.ts` or from `docs/architecture.md` (e.g. soft deletes, composite or implicit constraints, trigger/RPC behavior, cross-table expectations, RLS described in prose). **Keep `docs/database.md` updated** in the same change whenever you introduce or materially change such behavior. If the file is empty of project-specific content except this template, add the first concrete notes when the first non-obvious rule appears.
-- **Types to use in code**: When writing application code, prefer the convenience aliases from `src/types/database.ts` instead of raw Supabase types, so that your code stays readable and stable across type regenerations.
+- **Non-obvious database behavior**: Record it in `docs/database.md` (see that file for what belongs there and for typing conventions). **Keep `docs/database.md` updated** in the same change whenever you introduce or materially change such behavior. If the file has no project-specific notes yet beyond its template, add the first concrete notes when the first non-obvious rule appears.
 - **Recommended order when reasoning about data**:
   1. Consult `src/types/supabase.ts` for precise table/view/enum shapes.
-  2. Read `docs/database.md` for subtleties.
-  3. Use aliases from `src/types/database` in your implementation.
-  4. Look at migrations only to answer specific historical questions about how the schema evolved, or other information that is not covered in the docs.
+  2. Read `docs/database.md` for subtleties, project notes, and typing conventions.
+  3. Look at migrations only to answer specific historical questions about how the schema evolved, or other information that is not covered in the docs.

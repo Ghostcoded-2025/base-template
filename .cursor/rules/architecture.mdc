@@ -1,5 +1,5 @@
 ---
-description: Read, follow, and keep architecture and docs/database.md aligned with the codebase
+description: Read and keep docs/architecture.md aligned with the codebase for architecture-impacting work
 alwaysApply: true
 ---
 
@@ -8,4 +8,3 @@ alwaysApply: true
 - Before making architecture-impacting changes (e.g., data access patterns, module boundaries, or service responsibilities), **read and comply with** `docs/architecture.md`.
 - **Keep the doc current**: When you introduce or materially change architecture (new layers, boundaries, data flow, or major conventions), **update `docs/architecture.md` in the same change** so it stays the source of truth. Do not leave the document describing an outdated structure.
 - If `docs/architecture.md` is missing but the project clearly needs a written architecture overview, **add it** with enough structure for future work (sections for boundaries, data access, and major decisions) rather than only updating code.
-- **Database subtleties**: Rules and relationships that belong in written form but are **not** obvious from generated types or from `docs/architecture.md` belong in `docs/database.md` (see the database schema rule). When you change such behavior, **update `docs/database.md` in the same change** so implementers are not misled.
