@@ -8,7 +8,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons'
 import { isRunningAsInstalledPwa } from '@/lib/pwa'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 library.add(faEllipsisVertical)
 
@@ -46,8 +45,6 @@ const isStandalone = ref(false)
 const selectedScenario = ref<Scenario>('auto')
 const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
 const installPromptLoading = ref(false)
-
-const router = useRouter()
 
 const siteOrigin = computed(() => {
   if (typeof window === 'undefined') {
@@ -201,31 +198,12 @@ async function runInstallPrompt() {
   <div class="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-3xl">
       <div class="mb-8">
-        <div class="mb-3 flex flex-wrap items-start justify-between gap-4">
-          <h1 class="text-3xl font-bold text-gray-900">
-            Install Base Template on your device
-          </h1>
-          <button
-            type="button"
-            class="text-sm text-gray-600 hover:text-gray-900"
-            @click="router.back()"
-          >
-            Back
-          </button>
-        </div>
+        <h1 class="mb-3 text-3xl font-bold text-gray-900">
+          Install Base Template on your device
+        </h1>
         <p class="max-w-2xl text-gray-600">
           Base Template is a progressive web app. You can add it to your home screen or install it
           like a native app—no app store required.
-        </p>
-        <p class="mt-3 max-w-2xl text-sm text-gray-600">
-          There is no separate app store download—your browser uses the
-          <a
-            class="underline"
-            href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest"
-            rel="noopener noreferrer"
-            target="_blank"
-          >web app manifest</a>
-          (and HTTPS in production) so the site can be installed like an app.
         </p>
         <div class="mt-4">
           <label
@@ -565,22 +543,6 @@ async function runInstallPrompt() {
           </p>
         </section>
       </div>
-
-      <p class="mt-10 text-center text-sm text-gray-600">
-        <router-link
-          to="/login"
-          class="underline"
-        >
-          Sign in
-        </router-link>
-        <span class="mx-2 text-gray-400">·</span>
-        <router-link
-          to="/register"
-          class="underline"
-        >
-          Create an account
-        </router-link>
-      </p>
     </div>
   </div>
 </template>

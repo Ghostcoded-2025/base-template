@@ -4,8 +4,11 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { authAPI } from '@/lib/auth'
-import { replaceWithDashboardIfOnGuestAuthPath } from '@/router'
-import { isRunningAsInstalledPwa } from '@/lib/pwa'
+import {
+  publicNavPaths,
+  replaceWithDashboardIfOnGuestAuthPath,
+} from '@/router'
+import { useShowInstallNavLink } from '@/lib/pwa'
 import { useAccountStore } from '@/stores/account'
 import { useSessionStore } from '@/stores/session'
 
@@ -20,11 +23,15 @@ const isLoading = ref(true)
 
 const isLoginPage = computed(() => route.path === '/login')
 const isRegisterPage = computed(() => route.path === '/register')
+const showGuestNav = computed(
+  () =>
+    !isAuthenticated.value && publicNavPaths.has(route.path)
+)
 const showAdminNav = computed(
   () => rolesLoaded.value && canAccessAdmin.value
 )
 
-const showInstallNavLink = ref(!isRunningAsInstalledPwa())
+const showInstallNavLink = useShowInstallNavLink()
 
 async function bootstrapAuthenticated() {
   await Promise.all([
@@ -108,45 +115,73 @@ const handleSignOut = async () => {
 
     <div v-else>
       <nav
-        v-if="isAuthenticated && !isLoginPage && !isRegisterPage"
+        v-if="
+          showGuestNav ||
+            (isAuthenticated && !isLoginPage && !isRegisterPage)
+        "
         class="border-b border-gray-200 bg-white"
       >
         <div class="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-          <router-link
-            to="/dashboard"
-            class="text-sm font-medium"
-          >
-            App
-          </router-link>
-          <div class="flex items-center gap-4 text-sm">
+          <template v-if="showGuestNav">
+            <router-link
+              to="/"
+              class="text-sm font-medium"
+            >
+              App
+            </router-link>
+            <div class="flex items-center gap-4 text-sm">
+              <router-link
+                v-if="showInstallNavLink"
+                to="/install-app"
+                class="text-gray-600 hover:text-gray-900"
+              >
+                Install app
+              </router-link>
+              <router-link
+                to="/login"
+                class="text-gray-600 hover:text-gray-900"
+              >
+                Login
+              </router-link>
+            </div>
+          </template>
+          <template v-else>
             <router-link
               to="/dashboard"
-              class="text-gray-600 hover:text-gray-900"
+              class="text-sm font-medium"
             >
-              Dashboard
+              App
             </router-link>
-            <router-link
-              v-if="showInstallNavLink"
-              to="/install-app"
-              class="text-gray-600 hover:text-gray-900"
-            >
-              Install app
-            </router-link>
-            <router-link
-              v-if="showAdminNav"
-              to="/admin"
-              class="text-gray-600 hover:text-gray-900"
-            >
-              Admin
-            </router-link>
-            <button
-              type="button"
-              class="text-gray-600 hover:text-gray-900"
-              @click="handleSignOut"
-            >
-              Sign out
-            </button>
-          </div>
+            <div class="flex items-center gap-4 text-sm">
+              <router-link
+                to="/dashboard"
+                class="text-gray-600 hover:text-gray-900"
+              >
+                Dashboard
+              </router-link>
+              <router-link
+                v-if="showInstallNavLink"
+                to="/install-app"
+                class="text-gray-600 hover:text-gray-900"
+              >
+                Install app
+              </router-link>
+              <router-link
+                v-if="showAdminNav"
+                to="/admin"
+                class="text-gray-600 hover:text-gray-900"
+              >
+                Admin
+              </router-link>
+              <button
+                type="button"
+                class="text-gray-600 hover:text-gray-900"
+                @click="handleSignOut"
+              >
+                Sign out
+              </button>
+            </div>
+          </template>
         </div>
       </nav>
 

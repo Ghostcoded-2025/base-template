@@ -40,15 +40,6 @@ onMounted(async () => {
           Create an account
         </router-link>
       </div>
-
-      <p class="text-sm text-gray-600">
-        <router-link
-          to="/install-app"
-          class="underline"
-        >
-          Install app
-        </router-link>
-      </p>
     </div>
   </div>
 </template>

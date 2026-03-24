@@ -17,6 +17,11 @@ const guestPathsRedirectWhenAuthenticated = new Set([
   '/register',
 ])
 
+export const publicNavPaths = new Set<string>([
+  ...guestPathsRedirectWhenAuthenticated,
+  '/install-app',
+])
+
 export function replaceWithDashboardIfOnGuestAuthPath(r: Router): void {
   if (guestPathsRedirectWhenAuthenticated.has(r.currentRoute.value.path)) {
     void r.replace({ path: '/dashboard' })
