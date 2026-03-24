@@ -1,0 +1,1 @@
+-- Optional seed data for local development. Add INSERT statements here if needed.
