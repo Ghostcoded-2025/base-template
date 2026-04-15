@@ -16,6 +16,7 @@
     "lint:check": "eslint . --max-warnings 0",
     "verify": "npm run lint:check && npm run build",
     "db:types": "npx supabase gen types typescript --project-id xdgiftvbsdhhzvcjoeft --schema public > src/types/supabase.ts",
+    "db:types:local": "npx supabase gen types typescript --local --schema public > src/types/supabase.ts",
     "prepare": "husky"
   },
   "dependencies": {
