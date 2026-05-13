@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
 import { corsHeaders, jsonResponse } from '../_shared/http.ts'
 import { requireSuperAdmin } from '../_shared/require-super-admin.ts'
 
-const ALLOWED_ROLE_NAMES = ['admin', 'super_admin'] as const
+const ALLOWED_ROLE_NAMES = ['admin', 'super_admin', 'staff'] as const
 
 async function findUserIdByEmail(
   service: ReturnType<typeof createClient>,

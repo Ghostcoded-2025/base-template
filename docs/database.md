@@ -12,6 +12,6 @@ Everything below is behavior and conventions **not** obvious from types alone.
 - **`profile_roles`**: `profiles.id` ↔ `roles.id`, composite PK; `profiles.id` = `auth.users.id`.
 - **RLS**: Authenticated may `SELECT` all `roles`; own `profile_roles` rows only. **No** client policies for IUD on `profile_roles` — changes via Edge Functions + **service role** after server-side role checks.
 - **RPC** `current_user_has_role(role_name text)`: **`SECURITY DEFINER`**, evaluates role for `auth.uid()`.
-- **Bootstrap**: Seed `admin`, `super_admin`; first privileged user granted manually until a `super_admin` can use `assign-role`. Details in `supabase/migrations/20260324120000_roles_and_profile_roles.sql`.
+- **Bootstrap**: Catalog includes `admin`, `super_admin`, and `staff` (`staff` has no admin UI access; router checks `admin` / `super_admin` only). Local `supabase/seed.sql` inserts those roles plus test users `{admin,super_admin,staff}@test.com` / `test1234`. First privileged user on a fresh project can be granted manually until a `super_admin` can use `assign-role`. Details in `supabase/migrations/20260324120000_roles_and_profile_roles.sql`.
 
 Add sections for other non-obvious schema behavior as it appears.

@@ -16,6 +16,7 @@ const emit = defineEmits<{
 
 const adminChecked = ref(false)
 const superAdminChecked = ref(false)
+const staffChecked = ref(false)
 
 const isSelf = computed(() => {
   if (!props.user?.email || !props.currentUserEmail) {
@@ -33,6 +34,7 @@ watch(
     const roles = new Set(user.roles)
     adminChecked.value = roles.has('admin')
     superAdminChecked.value = roles.has('super_admin')
+    staffChecked.value = roles.has('staff')
   },
   { immediate: true }
 )
@@ -51,6 +53,10 @@ function onAdminChange(checked: boolean) {
   }
 }
 
+function onStaffChange(checked: boolean) {
+  staffChecked.value = checked
+}
+
 function handleClose() {
   emit('close')
 }
@@ -65,6 +71,9 @@ function handleSave() {
   }
   if (superAdminChecked.value) {
     next.push('super_admin')
+  }
+  if (staffChecked.value) {
+    next.push('staff')
   }
   emit('save', props.user.email, next)
 }
@@ -120,6 +129,16 @@ function handleSave() {
             @change="onSuperAdminChange(($event.target as HTMLInputElement).checked)"
           >
           <span>Super admin</span>
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            class="rounded border-gray-300"
+            :checked="staffChecked"
+            :disabled="isSelf"
+            @change="onStaffChange(($event.target as HTMLInputElement).checked)"
+          >
+          <span>Staff (no admin pages)</span>
         </label>
       </div>
 
