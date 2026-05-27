@@ -10,20 +10,22 @@ import RegisterView from '../views/RegisterView.vue'
 import { profileAPI } from '@/lib/profile'
 import { authAPI } from '@/lib/auth'
 
-/** Logged-in users are sent to the dashboard instead of these paths. */
-const guestPathsRedirectWhenAuthenticated = new Set([
-  '/',
+/** Public routes — no auth required; landing stays reachable when signed in. */
+const publicPaths = new Set(['/', '/install-app'])
+
+/** Logged-in users are sent to the dashboard instead of these auth paths. */
+const guestAuthPathsRedirectWhenAuthenticated = new Set([
   '/login',
   '/register',
 ])
 
 export const publicNavPaths = new Set<string>([
-  ...guestPathsRedirectWhenAuthenticated,
-  '/install-app',
+  ...publicPaths,
+  ...guestAuthPathsRedirectWhenAuthenticated,
 ])
 
 export function replaceWithDashboardIfOnGuestAuthPath(r: Router): void {
-  if (guestPathsRedirectWhenAuthenticated.has(r.currentRoute.value.path)) {
+  if (guestAuthPathsRedirectWhenAuthenticated.has(r.currentRoute.value.path)) {
     void r.replace({ path: '/dashboard' })
   }
 }
@@ -78,19 +80,19 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  if (guestPathsRedirectWhenAuthenticated.has(to.path)) {
+  if (publicPaths.has(to.path)) {
+    return true
+  }
+
+  if (guestAuthPathsRedirectWhenAuthenticated.has(to.path)) {
     try {
       const { data } = await authAPI.getCurrentUser()
       if (data.user) {
         return { path: '/dashboard', replace: true }
       }
     } catch {
-      // Stay on marketing / auth pages if the session cannot be read.
+      // Stay on auth pages if the session cannot be read.
     }
-    return true
-  }
-
-  if (to.path === '/install-app') {
     return true
   }
 

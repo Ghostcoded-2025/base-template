@@ -1,22 +1,6 @@
-<script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-
-import { authAPI } from '@/lib/auth'
-
-const router = useRouter()
-
-onMounted(async () => {
-  const { data } = await authAPI.getCurrentUser()
-  if (data.user) {
-    void router.push('/dashboard')
-  }
-})
-</script>
-
 <template>
-  <div class="flex min-h-screen items-center justify-center px-4 py-12">
-    <div class="w-full max-w-sm space-y-8 text-center">
+  <div class="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-sm space-y-8 text-center">
       <div>
         <h1 class="text-lg font-medium text-gray-900">
           App
