@@ -40,11 +40,13 @@ flowchart TB
 - **`src/views/`** — Route-level UI; keep thin. Public vs authenticated flows and route-level UI conventions → **`docs/frontend-conventions.md`**.
 - **`src/router/`** — Route table, `meta`, and global navigation guards (`beforeEach`).
 - **`src/App.vue`** — Layout; authenticated session lifecycle (bootstrap / clear) lives here—details in `docs/frontend-conventions.md`.
-- **`src/lib/`** — Shared integrations: `supabase.ts`, `auth.ts`, `profile.ts`, `admin.ts`, `pwa.ts`.
+- **`src/lib/`** — Shared integrations: `supabase.ts`, `auth.ts`, `profile.ts`, `admin.ts`, `organizations.ts`, `storage.ts`, `pwa.ts`.
 - **`src/types/`** — `supabase.ts` generated (do not hand-edit); `database.ts` app aliases—see `docs/database.md`.
 
 **Data access**: Single browser client in `src/lib/supabase.ts`, typed with `Database` from `src/types/database.ts`, env `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Flow: PostgREST and RPCs under **RLS** where appropriate; work that must not depend on the client alone uses **Edge Functions** (verify caller, then elevated access such as service role).
 
-**ESLint import boundaries**: `@typescript-eslint/no-restricted-imports` blocks `import … from '@/lib/supabase'` outside the integration layer. **Allowed** importers today: `src/lib/auth.ts`, `src/lib/profile.ts`, `src/lib/admin.ts`, plus `src/lib/supabase.ts` itself. Everything else should use `auth` / `profile` / `admin` helpers, Pinia actions, or Edge-backed APIs—not a new direct client import. **When you add a new `src/lib/` module that must use the client**, extend the `ignores` list on the `app/restrict-supabase-client-import` block in `eslint.config.ts` and update this paragraph so the doc and linter stay aligned.
+**ESLint import boundaries**: `@typescript-eslint/no-restricted-imports` blocks `import … from '@/lib/supabase'` outside the integration layer. **Allowed** importers today: `src/lib/auth.ts`, `src/lib/profile.ts`, `src/lib/admin.ts`, `src/lib/organizations.ts`, `src/lib/storage.ts`, plus `src/lib/supabase.ts` itself. Everything else should use `auth` / `profile` / `admin` / `organizations` helpers, Pinia actions, or Edge-backed APIs—not a new direct client import. **When you add a new `src/lib/` module that must use the client**, extend the `ignores` list on the `app/restrict-supabase-client-import` block in `eslint.config.ts` and update this paragraph so the doc and linter stay aligned.
+
+**Org context**: Authenticated users have a single `profiles.org_id`; queries and Storage paths should use that tenant. Details: **`docs/multi-tenancy.md`**.
 
 **Decisions**: Two Pinia stores for signed-in UX; route guards must not rely on Pinia alone—**`docs/frontend-conventions.md`**.

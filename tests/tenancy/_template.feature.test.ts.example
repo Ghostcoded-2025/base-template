@@ -1,0 +1,35 @@
+/**
+ * Copy to `<feature>.test.ts` when adding a tenant-scoped table or API.
+ */
+import { describe, expect, it } from 'vitest'
+
+import {
+  ACME_ORG_ID,
+  createAnonClient,
+  GLOBEX_ORG_ID,
+  SEED_PASSWORD,
+  signInAs,
+} from './setup'
+
+describe('widgets tenancy', () => {
+  const client = createAnonClient()
+
+  it('cannot select widgets from another org', async () => {
+    await signInAs(client, 'admin@test.com', SEED_PASSWORD)
+    const { data, error } = await client
+      .from('widgets')
+      .select('id')
+      .eq('org_id', GLOBEX_ORG_ID)
+    expect(error).toBeNull()
+    expect(data?.length ?? 0).toBe(0)
+  })
+
+  it('cannot insert a widget for another org', async () => {
+    await signInAs(client, 'admin@test.com', SEED_PASSWORD)
+    const { error } = await client.from('widgets').insert({
+      org_id: GLOBEX_ORG_ID,
+      name: 'cross-tenant probe',
+    })
+    expect(error).not.toBeNull()
+  })
+})

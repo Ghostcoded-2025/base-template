@@ -70,6 +70,12 @@ const routes: RouteRecordRaw[] = [
     path: '/admin/management',
     name: 'admin-management',
     component: () => import('../views/AdminManagementView.vue'),
+    meta: { requiresAdmin: true },
+  },
+  {
+    path: '/admin/organizations',
+    name: 'admin-organizations',
+    component: () => import('../views/AdminOrganizationsView.vue'),
     meta: { requiresSuperAdmin: true },
   },
 ]

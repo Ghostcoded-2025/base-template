@@ -1,4 +1,4 @@
--- Global role catalog and profile membership. Client writes go through Edge Functions (service_role).
+-- Role catalog and profile membership. Tenancy (org-scoped roles, RLS) in organizations_and_tenancy migration.
 
 CREATE TABLE public.roles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -54,10 +54,3 @@ $$;
 REVOKE ALL ON FUNCTION public.current_user_has_role(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.current_user_has_role(text) TO authenticated;
 
--- Bootstrap: after your first user exists, grant super_admin (and admin) via SQL or Edge Function once
--- you have one super_admin. Example (replace :user_id):
--- INSERT INTO public.profile_roles (profile_id, role_id)
--- SELECT :user_id, r.id FROM public.roles r WHERE r.name = 'super_admin';
--- INSERT INTO public.profile_roles (profile_id, role_id)
--- SELECT :user_id, r.id FROM public.roles r WHERE r.name = 'admin'
---   ON CONFLICT DO NOTHING;

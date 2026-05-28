@@ -1,14 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { authAPI } from '@/lib/auth'
+import { organizationsAPI, type OrganizationOption } from '@/lib/organizations'
 
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const fullName = ref('')
+const selectedOrgId = ref('')
+const organizations = ref<OrganizationOption[]>([])
+const isLoadingOrgs = ref(true)
 const isLoading = ref(false)
 const error = ref('')
 const isSignupSuccess = ref(false)
+
+async function loadOrganizations() {
+  isLoadingOrgs.value = true
+  const { data, error: listError } = await organizationsAPI.listForSignup()
+  isLoadingOrgs.value = false
+  if (listError) {
+    error.value = listError.message
+    return
+  }
+  organizations.value = data
+}
+
+onMounted(() => {
+  void loadOrganizations()
+})
 
 const handleRegister = async () => {
   isLoading.value = true
@@ -20,11 +39,19 @@ const handleRegister = async () => {
       return
     }
 
+    if (!selectedOrgId.value) {
+      error.value = 'Organization is required.'
+      return
+    }
+
     const origin = typeof window !== 'undefined' ? window.location.origin : undefined
-    const { error: authError } = await authAPI.signUp(email.value, password.value, {
-      fullName: fullName.value.trim() || undefined,
-      emailRedirectTo: origin ? `${origin}/dashboard` : undefined,
-    })
+    const { error: authError } = await authAPI.signUp(
+      email.value,
+      password.value,
+      selectedOrgId.value,
+      fullName.value,
+      origin ? `${origin}/dashboard` : undefined
+    )
 
     if (authError) {
       error.value = authError.message
@@ -48,7 +75,8 @@ const handleRegister = async () => {
           Create account
         </h1>
         <p class="mt-1 text-sm text-gray-600">
-          Sign up with email and password.
+          Sign up with email and password. Choose your organization. An administrator
+          will assign your role after your account is created.
         </p>
       </div>
 
@@ -57,6 +85,7 @@ const handleRegister = async () => {
         class="space-y-4 rounded border border-gray-200 bg-white p-4 text-sm text-gray-700"
       >
         <p>Check your email to confirm your account if confirmation is enabled in Supabase.</p>
+        <p>An org administrator must assign you a role before you can use admin features.</p>
         <router-link
           to="/login"
           class="text-gray-900 underline"
@@ -70,6 +99,33 @@ const handleRegister = async () => {
         class="space-y-4"
         @submit.prevent="handleRegister"
       >
+        <div>
+          <label
+            for="organization"
+            class="block text-sm text-gray-700"
+          >Organization</label>
+          <select
+            id="organization"
+            v-model="selectedOrgId"
+            required
+            :disabled="isLoadingOrgs"
+            class="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          >
+            <option
+              value=""
+              disabled
+            >
+              {{ isLoadingOrgs ? 'Loading…' : 'Select organization' }}
+            </option>
+            <option
+              v-for="org in organizations"
+              :key="org.id"
+              :value="org.id"
+            >
+              {{ org.name }}
+            </option>
+          </select>
+        </div>
         <div>
           <label
             for="fullName"
@@ -139,7 +195,7 @@ const handleRegister = async () => {
 
         <button
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || isLoadingOrgs"
           class="w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-sm text-white disabled:opacity-50"
         >
           {{ isLoading ? 'Creating account…' : 'Create account' }}

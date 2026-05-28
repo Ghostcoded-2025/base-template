@@ -52,10 +52,12 @@ export interface AdminUserRow {
 }
 
 export const adminAPI = {
-  async listUsers(params?: { search?: string }) {
+  async listUsers(search?: string) {
+    const trimmed = search?.trim()
+    const body = trimmed ? { search: trimmed } : {}
     return postJson<{
       users: AdminUserRow[]
-    }>('list-admin-users', params ?? {})
+    }>('list-admin-users', body)
   },
 
   async setUserRoles(email: string, roles: string[]) {
@@ -63,5 +65,12 @@ export const adminAPI = {
       email,
       roles,
     })
+  },
+
+  async createOrganization(name: string) {
+    return postJson<{ id: string; name: string; storage_bucket_id: string }>(
+      'create-organization',
+      { name }
+    )
   },
 }

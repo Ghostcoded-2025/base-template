@@ -7,13 +7,29 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.4"
-  }
   public: {
     Tables: {
+      organizations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          storage_bucket_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          storage_bucket_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          storage_bucket_id?: string
+        }
+        Relationships: []
+      }
       profile_roles: {
         Row: {
           created_at: string
@@ -52,39 +68,61 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          org_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           full_name?: string | null
           id: string
+          org_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           full_name?: string | null
           id?: string
+          org_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roles: {
         Row: {
           created_at: string
           id: string
           name: string
+          org_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          org_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          org_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "roles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -92,6 +130,8 @@ export type Database = {
     }
     Functions: {
       current_user_has_role: { Args: { role_name: string }; Returns: boolean }
+      current_user_org_id: { Args: never; Returns: string }
+      user_belongs_to_org: { Args: { target_org_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -224,3 +264,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

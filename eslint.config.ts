@@ -54,6 +54,8 @@ export default defineConfigWithVueTs(
       'src/lib/auth.ts',
       'src/lib/profile.ts',
       'src/lib/admin.ts',
+      'src/lib/organizations.ts',
+      'src/lib/storage.ts',
     ],
     rules: {
       '@typescript-eslint/no-restricted-imports': [

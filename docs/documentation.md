@@ -10,6 +10,7 @@
 | --- | --- |
 | **`docs/architecture.md`** | Layers, boundaries, where data flows (browser vs server paths). |
 | **`docs/database.md`** | `supabase.ts` vs migrations, behavior not in types, RLS/RBAC, `database.ts` aliases. |
+| **`docs/multi-tenancy.md`** | Organizations, `profiles.org_id`, per-org `roles`, Storage paths, signup, CI tenancy lint. |
 | **`docs/documentation.md`** | Changing how docs work; this index; ownership disputes. |
 | **`docs/frontend-conventions.md`** | Vue, Pinia, router, `lib/` usage, stores, freshness, Tailwind. |
 | **`docs/NEW_PROJECT_TODOS.md`** | One-time checklist when cloning this template (not product canon). |

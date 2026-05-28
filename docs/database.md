@@ -4,14 +4,13 @@
 
 **App typing**: Prefer row/insert/update aliases from **`src/types/database.ts`** when present; add aliases in `database.ts` as more tables matter.
 
-Everything below is behavior and conventions **not** obvious from types alone.
+**Multi-tenancy** (orgs, membership, domain `org_id`, Storage): **`docs/multi-tenancy.md`**.
 
 ## RBAC (`roles`, `profile_roles`, `current_user_has_role`)
 
-- **`roles`**: global catalog, `name` unique.
-- **`profile_roles`**: `profiles.id` ↔ `roles.id`, composite PK; `profiles.id` = `auth.users.id`.
-- **RLS**: Authenticated may `SELECT` all `roles`; own `profile_roles` rows only. **No** client policies for IUD on `profile_roles` — changes via Edge Functions + **service role** after server-side role checks.
-- **RPC** `current_user_has_role(role_name text)`: **`SECURITY DEFINER`**, evaluates role for `auth.uid()`.
-- **Bootstrap**: Catalog includes `admin`, `super_admin`, and `staff` (`staff` has no admin UI access; router checks `admin` / `super_admin` only). Local `supabase/seed.sql` inserts those roles plus test users `{admin,super_admin,staff}@test.com` / `test1234`. First privileged user on a fresh project can be granted manually until a `super_admin` can use `assign-role`. Details in `supabase/migrations/20260324120000_roles_and_profile_roles.sql`.
-
-Add sections for other non-obvious schema behavior as it appears.
+- **`roles`**: per-org permission definitions (`admin`, `staff`, …) with `org_id NOT NULL`; **`super_admin`** is the only row with `org_id IS NULL`. Unique per org: `(org_id, name)`. New orgs get default roles via `bootstrap_organization_roles` trigger.
+- **`profile_roles`**: junction `(profile_id, role_id)`; no `org_id`. Trigger `validate_profile_role_membership` ensures role org matches `profiles.org_id` (or global `super_admin`).
+- **RLS**: `authenticated` reads in-tenant `roles` only. Users read own `profile_roles` when linked role is in-tenant. **No** client IUD on `profile_roles` — **`assign-role`** Edge Function (service role) only.
+- **RPC** `current_user_has_role(role_name text)`: matches role name where `roles.org_id IS NULL` (super_admin) or `roles.org_id = current_user_org_id()`.
+- **Composite FK targets**: `profiles` and `roles` have `UNIQUE (id, org_id)` for tenant-safe references (see **`docs/multi-tenancy.md`**).
+- **Seed**: `supabase/seed.sql` — Acme/Globex orgs, test users with metadata via `handle_new_user`, extra `super_admin` row for `super_admin@test.com`.

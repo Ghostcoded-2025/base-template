@@ -1,7 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
 
 import { corsHeaders, jsonResponse } from '../_shared/http.ts'
-import { requireSuperAdmin } from '../_shared/require-super-admin.ts'
+import { requireAdmin } from '../_shared/require-admin.ts'
 
 const ALLOWED_ROLE_NAMES = ['admin', 'super_admin', 'staff'] as const
 
@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Method not allowed' }, 405)
   }
 
-  const authz = await requireSuperAdmin(req)
+  const authz = await requireAdmin(req)
   if (!authz.ok) {
     return authz.response
   }
@@ -80,6 +80,10 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: message }, 400)
   }
 
+  if (!authz.isSuperAdmin && roleNames.includes('super_admin')) {
+    return jsonResponse({ error: 'Forbidden' }, 403)
+  }
+
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!supabaseUrl || !serviceKey) {
@@ -99,17 +103,50 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Cannot modify your own roles' }, 403)
   }
 
-  const { data: roleRows, error: rolesError } = await service
-    .from('roles')
-    .select('id, name')
-    .in('name', roleNames)
+  const { data: targetProfile, error: profileError } = await service
+    .from('profiles')
+    .select('org_id')
+    .eq('id', targetId)
+    .maybeSingle()
 
-  if (rolesError || !roleRows) {
-    return jsonResponse({ error: rolesError?.message ?? 'Role lookup failed' }, 500)
+  if (profileError || !targetProfile?.org_id) {
+    return jsonResponse({ error: 'Target profile not found' }, 404)
   }
 
-  if (roleRows.length !== roleNames.length) {
-    return jsonResponse({ error: 'Could not resolve all role names' }, 400)
+  const targetOrgId = targetProfile.org_id as string
+
+  if (!authz.isSuperAdmin && targetOrgId !== authz.orgId) {
+    return jsonResponse({ error: 'Forbidden' }, 403)
+  }
+
+  const roleRows: { id: string; name: string }[] = []
+
+  for (const roleName of roleNames) {
+    if (roleName === 'super_admin') {
+      const { data: row, error } = await service
+        .from('roles')
+        .select('id, name')
+        .eq('name', 'super_admin')
+        .is('org_id', null)
+        .maybeSingle()
+      if (error || !row) {
+        return jsonResponse({ error: 'super_admin role not found' }, 500)
+      }
+      roleRows.push(row)
+      continue
+    }
+
+    const { data: row, error } = await service
+      .from('roles')
+      .select('id, name')
+      .eq('name', roleName)
+      .eq('org_id', targetOrgId)
+      .maybeSingle()
+
+    if (error || !row) {
+      return jsonResponse({ error: `Role not found for org: ${roleName}` }, 400)
+    }
+    roleRows.push(row)
   }
 
   const { error: delError } = await service.from('profile_roles').delete().eq('profile_id', targetId)

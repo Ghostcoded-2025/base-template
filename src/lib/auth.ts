@@ -6,16 +6,22 @@ export const authAPI = {
   async signUp(
     email: string,
     password: string,
-    options?: { fullName?: string; emailRedirectTo?: string }
+    orgId: string,
+    fullName?: string,
+    emailRedirectTo?: string
   ) {
+    const metadata: Record<string, string> = { org_id: orgId }
+    const trimmedName = fullName?.trim()
+    if (trimmedName) {
+      metadata.full_name = trimmedName
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: options?.emailRedirectTo,
-        ...(options?.fullName
-          ? { data: { full_name: options.fullName } }
-          : {}),
+        emailRedirectTo,
+        data: metadata,
       },
     })
     return { data, error }

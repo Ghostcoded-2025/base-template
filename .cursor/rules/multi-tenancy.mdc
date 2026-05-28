@@ -1,0 +1,18 @@
+---
+description: Multi-tenant org_id and RLS requirements for schema and data access
+alwaysApply: true
+---
+
+# Multi-tenancy
+
+Full rules: **`docs/multi-tenancy.md`**.
+
+- New **domain** tables: `org_id NOT NULL`, FK to `organizations`, `UNIQUE (id, org_id)`, index, RLS with `user_belongs_to_org(org_id)` in the same migration.
+- Composite FK for references between tenant tables: `FOREIGN KEY (parent_id, org_id) REFERENCES parent(id, org_id)`.
+- `profiles.org_id` = membership only; `profile_roles` has no `org_id` (scope via `roles.org_id` + trigger).
+- `roles`: per-org rows; only `super_admin` has `org_id IS NULL`; bootstrap on org create.
+- Signup: require `org_id` in metadata only; never insert `profile_roles` in triggers; roles via `assign-role`.
+- Storage: **one private bucket per org** (`storage_bucket_id` = org uuid); paths without org prefix; RLS on `storage.objects`.
+- New orgs: `create-organization` Edge Function (`super_admin` only).
+- New tenant features: add negative tests in `tests/tenancy/` — see **`tenancy-integration-tests.mdc`**.
+- After schema changes: `npm run db:types:local`, `npm run db:lint:tenancy`, and `npm run test:tenancy`.

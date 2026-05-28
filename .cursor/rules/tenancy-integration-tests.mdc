@@ -1,0 +1,17 @@
+---
+description: Require negative cross-tenant Vitest tests when adding tenant-scoped features
+globs: supabase/migrations/**/*.sql,src/**/*.ts,src/**/*.vue
+alwaysApply: false
+---
+
+# Tenancy integration tests
+
+When a change adds or exposes **tenant-scoped** data (new table with `org_id`, Storage usage, Edge Function reads/writes for domain data):
+
+1. Add or update **`tests/tenancy/<feature>.test.ts`** (copy from `tests/tenancy/_template.feature.test.ts.example`).
+2. Minimum cases:
+   - Cross-org **read** returns no rows or an error.
+   - Cross-org **write** fails.
+3. Run locally: `supabase db reset` then `npm run test:tenancy`.
+
+Details: **`tests/tenancy/README.md`**, **`docs/multi-tenancy.md`**.

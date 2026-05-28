@@ -14,4 +14,6 @@ Assume a **hostile client** (devtools, forged requests).
 
 **New feature**: Still safe if the SPA is skipped and only HTTP is used? If not, tighten **RLS** and/or **server verification**.
 
+**Tenant isolation**: `profiles.org_id` + `org_id` on domain tables under RLS; **one Storage bucket per org** (`storage_bucket_id` = org UUID) with `storage.objects` policies — not Pinia/router alone. See **`docs/multi-tenancy.md`**.
+
 Per-table RLS/RBAC: `docs/database.md`. Store refresh after mutations: `docs/frontend-conventions.md`.

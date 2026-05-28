@@ -1,10 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
 
 import { corsHeaders, jsonResponse } from '../_shared/http.ts'
-import { requireSuperAdmin } from '../_shared/require-super-admin.ts'
+import { requireAdmin } from '../_shared/require-admin.ts'
 
 type ListBody = {
   search?: string
+  org_id?: string
 }
 
 Deno.serve(async (req) => {
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Method not allowed' }, 405)
   }
 
-  const authz = await requireSuperAdmin(req)
+  const authz = await requireAdmin(req)
   if (!authz.ok) {
     return authz.response
   }
@@ -33,6 +34,12 @@ Deno.serve(async (req) => {
   const search =
     typeof body.search === 'string' ? body.search.trim().toLowerCase() : ''
 
+  const filterOrgId = authz.isSuperAdmin
+    ? typeof body.org_id === 'string' && body.org_id.length > 0
+      ? body.org_id
+      : null
+    : authz.orgId
+
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!supabaseUrl || !serviceKey) {
@@ -42,6 +49,24 @@ Deno.serve(async (req) => {
   const service = createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
+
+  let profileQuery = service.from('profiles').select('id, full_name, org_id')
+  if (filterOrgId) {
+    profileQuery = profileQuery.eq('org_id', filterOrgId)
+  }
+
+  const { data: profiles, error: profilesError } = await profileQuery
+  if (profilesError) {
+    return jsonResponse({ error: profilesError.message }, 500)
+  }
+
+  const profileRows = profiles ?? []
+  if (profileRows.length === 0) {
+    return jsonResponse({ users: [] })
+  }
+
+  const profileIds = profileRows.map((p) => p.id as string)
+  const profileMap = new Map(profileRows.map((p) => [p.id as string, p]))
 
   const collected: { id: string; email: string | undefined }[] = []
   let page = 1
@@ -56,6 +81,9 @@ Deno.serve(async (req) => {
       break
     }
     for (const u of users) {
+      if (!profileIds.includes(u.id)) {
+        continue
+      }
       const em = u.email ?? ''
       if (search && !em.toLowerCase().includes(search)) {
         continue
@@ -68,24 +96,11 @@ Deno.serve(async (req) => {
     page += 1
   }
 
+  if (collected.length === 0) {
+    return jsonResponse({ users: [] })
+  }
+
   const ids = collected.map((u) => u.id)
-
-  if (ids.length === 0) {
-    return jsonResponse({
-      users: [],
-    })
-  }
-
-  const { data: profiles, error: profilesError } = await service
-    .from('profiles')
-    .select('id, full_name')
-    .in('id', ids)
-
-  if (profilesError) {
-    return jsonResponse({ error: profilesError.message }, 500)
-  }
-
-  const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]))
 
   const { data: prRows, error: prError } = await service
     .from('profile_roles')
@@ -113,7 +128,7 @@ Deno.serve(async (req) => {
     return {
       id: u.id,
       email: u.email ?? '',
-      full_name: prof?.full_name ?? null,
+      full_name: (prof?.full_name as string | null) ?? null,
       roles: rolesByProfile.get(u.id) ?? [],
     }
   })

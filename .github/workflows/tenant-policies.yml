@@ -1,0 +1,38 @@
+name: Tenancy checks
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  tenancy-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: npm ci
+
+      - run: supabase start
+
+      - run: supabase db reset
+
+      - name: Export Supabase env for tests
+        run: |
+          echo "SUPABASE_API_URL=$(supabase status -o json | jq -r '.API_URL')" >> "$GITHUB_ENV"
+          echo "SUPABASE_ANON_KEY=$(supabase status -o json | jq -r '.ANON_KEY')" >> "$GITHUB_ENV"
+
+      - run: npm run db:lint:tenancy
+        env:
+          SUPABASE_DB_CONTAINER: supabase_db_base-template
+
+      - run: npm run test:tenancy

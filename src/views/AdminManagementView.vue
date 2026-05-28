@@ -26,9 +26,7 @@ async function load() {
     const { data: authData } = await authAPI.getCurrentUser()
     currentUserEmail.value = authData.user?.email ?? null
 
-    const res = await adminAPI.listUsers({
-      search: search.value.trim() || undefined,
-    })
+    const res = await adminAPI.listUsers(search.value.trim() || undefined)
     users.value = res.users
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : 'Could not load users.'
