@@ -26,7 +26,7 @@ This template uses a **manifest-only** PWA (no service worker). When you ship a 
 ## Supabase CLI / local stack
 
 - `**supabase/config.toml`** — set `project_id` to a unique string per repo (helps distinguish local Supabase instances).
-- **Port collisions** — if you run **multiple** local Supabase projects on one machine, every port in `config.toml` must be unique per project. Search for `port =` and align related URLs:
+- **Local ports** — **randomize** every port in `supabase/config.toml` when you copy the template (do not keep the template’s `5473x` / `8083` values). Pick unused high ports (e.g. random values in `40000–60000`) so multiple local Supabase stacks on one machine are unlikely to collide. Within one project, each `port =` must still be unique; align related URLs (e.g. `[studio].api_url` must use `[api].port`). Search for `port =` and update:
   - `[api].port` — REST/Auth API (and match `[studio].api_url` if present).
   - `[db].port`, `[db].shadow_port`, `[db.pooler].port` (if pooler is enabled).
   - `[studio].port`
