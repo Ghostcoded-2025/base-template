@@ -1,0 +1,49 @@
+---
+description: Rewrite features fully; remove legacy code and all references without historical callouts
+alwaysApply: true
+---
+
+# No Backwards Compatibility
+
+When updating or modifying a feature, treat the change as a **full rewrite** of the relevant portions. Do not preserve old behavior, shims, feature flags, or parallel code paths “just in case.”
+
+## Code
+
+- **Remove** replaced APIs, tables, routes, env vars, migrations patterns, and dead branches—do not leave them commented out or marked deprecated.
+- **Do not add** compatibility layers (adapters, fallbacks, dual reads/writes, version checks) unless the user explicitly asks for them.
+- **Update all call sites** in the same change; do not leave consumers on the old path.
+
+## Documentation
+
+- Document **only the current** behavior and constraints.
+- **Do not** mention prior designs, renamed concepts, or removed flows—even to contrast or explain a change.
+- **Avoid** phrases like “supersedes…”, “replaces the old…”, “no longer includes…”, “legacy…”, “formerly…”, or “migration from…”.
+
+## Examples
+
+```typescript
+// ❌ BAD – compatibility shim
+function getOrgId(user: User): string {
+  return user.orgId ?? user.organization_id; // old field
+}
+
+// ✅ GOOD – single source of truth
+function getOrgId(user: User): string {
+  return user.orgId;
+}
+```
+
+```markdown
+<!-- ❌ BAD, references legacy process directly -->
+Signup now uses `org_id` in metadata. The legacy default-role trigger was removed.
+
+<!-- ❌ BAD,still references old functionality -->
+Signup requires `org_id` and `role_id` in user metadata; triggers do not assign a default role.
+
+<!-- ✅ GOOD -->
+Signup requires `org_id` and `role_id` in user metadata.
+```
+
+## When changing existing work
+
+If you find legacy code, references, or doc callouts while implementing a feature change, **delete them** as part of the same change rather than working around them.
