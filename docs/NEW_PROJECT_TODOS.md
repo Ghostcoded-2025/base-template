@@ -28,13 +28,14 @@ This template uses a **manifest-only** PWA (no service worker). When you ship a 
 ## Supabase CLI / local stack
 
 - `**supabase/config.toml`** — set `project_id` to a unique string per repo (helps distinguish local Supabase instances).
-- **Local ports** — **randomize** every port in `supabase/config.toml` when you copy the template (do not keep the template’s `5473x` / `8083` values). Pick unused high ports (e.g. random values in `40000–60000`) so multiple local Supabase stacks on one machine are unlikely to collide. Within one project, each `port =` must still be unique; align related URLs (e.g. `[studio].api_url` must use `[api].port`). Search for `port =` and update:
-  - `[api].port` — REST/Auth API (and match `[studio].api_url` if present).
-  - `[db].port`, `[db].shadow_port`, `[db.pooler].port` (if pooler is enabled).
-  - `[studio].port`
-  - `[inbucket].port` and `smtp_port` (local email testing).
-  - `[analytics].port`
-  - `[edge_runtime].inspector_port`
+- **Local ports** — assign a dedicated block in `supabase/config.toml` when you copy the template (do not keep template defaults). Practical rules:
+  - **Avoid `5184x` and `5473x`** — often already used by other local Supabase projects on the same machine.
+  - **Avoid Windows excluded ranges** — especially `52884–52983`; run `netsh interface ipv4 show excludedportrange protocol=tcp` for the full list on your machine.
+  - **Pick a dedicated ~10-port block per project** — api, db, shadow, studio, inbucket, smtp, analytics, inspector, pooler; each `port =` must be unique within the project.
+  - **Align related settings** — e.g. `[studio].api_url` must match `[api].port`.
+  - **Check before assigning** — `netstat -ano | Select-String "5410"` for collisions (adjust the pattern to your candidate block); `netsh interface ipv4 show excludedportrange protocol=tcp` for Windows blocks.
+  - **Safe-ish zones** — gaps between excluded ranges on your machine (e.g. `54100–57571`), as long as you verify with `netstat` first.
+  - Search for `port =` and update: `[api].port` (and `[studio].api_url`), `[db].port`, `[db].shadow_port`, `[db.pooler].port` (if pooler enabled), `[studio].port`, `[inbucket].port` / `smtp_port`, `[analytics].port`, `[edge_runtime].inspector_port`.
 - `**[auth].site_url`** and `**[auth].additional_redirect_urls**` — must match your dev server origin (default Vite is `http://localhost:5173`) and production URLs when you deploy.
 
 ## Environment variables
