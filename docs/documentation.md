@@ -12,7 +12,7 @@
 | **`docs/database.md`** | `supabase.ts` vs migrations, behavior not in types, RLS/RBAC, `database.ts` aliases. |
 | **`docs/documentation.md`** | Changing how docs work; this index; ownership disputes. |
 | **`docs/frontend-conventions.md`** | Vue, Pinia, router, `lib/` usage, stores, freshness, Tailwind. |
-| **`docs/NEW_PROJECT_TODOS.md`** | One-time checklist when cloning this template (not product canon). |
+| **`docs/NEW_PROJECT_TODOS.md`** | One-time checklist when cloning this template (not product canon); delete the file when finished. |
 | **`docs/security.md`** | Authorization vs UX; what may be treated as proof of privilege. |
 | **`docs/styling.md`** | Theme, layout widths, canonical Tailwind recipes; reuse vs extract component (≥3×). |
 

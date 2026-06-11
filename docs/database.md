@@ -1,6 +1,6 @@
 # Database
 
-**Shapes**: Tables/columns/enums → **`src/types/supabase.ts`** only; regenerate with `npm run db:types` (remote project) or `npm run db:types:local` (local Supabase, requires `supabase start`); do not hand-edit. **Do not infer** shapes from migrations. **Reasoning order**: `supabase.ts` → this file → migrations (**history only**).
+**Shapes**: Tables/columns/enums → **`src/types/supabase.ts`** only; regenerate with `npm run db:types` (linked Supabase project, requires `supabase link`) or `npm run db:types:local` (local Supabase, requires `supabase start`); do not hand-edit. **Do not infer** shapes from migrations. **Reasoning order**: `supabase.ts` → this file → migrations (**history only**).
 
 **App typing**: Prefer row/insert/update aliases from **`src/types/database.ts`** when present; add aliases in `database.ts` as more tables matter.
 

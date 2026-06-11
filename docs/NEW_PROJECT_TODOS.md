@@ -2,6 +2,8 @@
 
 After copying this template for a real app, update the following. Anything listed here is **generic placeholder** configuration, not product-specific.
 
+**When every item below is done, delete this file** (`docs/NEW_PROJECT_TODOS.md`). It is setup-only—not product documentation—and must not stay in the repo.
+
 ## Naming and branding
 
 - `**package.json`** — change the `name` field from the placeholder to your package name (currently set to a neutral starter name).
