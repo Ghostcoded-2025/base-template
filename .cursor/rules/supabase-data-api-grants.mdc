@@ -1,0 +1,42 @@
+---
+description: Explicit Postgres grants for new public tables (Supabase Data API)
+globs: supabase/migrations/**/*.sql
+alwaysApply: false
+---
+
+# Supabase Data API grants
+
+New tables in `public` are **not** auto-exposed to PostgREST / `supabase-js`. Do not assume default privileges; grant access in the **same migration** that creates the table.
+
+## Every new `public` table
+
+1. **Enable RLS** and add policies before any client or Edge Function uses the table.
+2. **Grant table privileges** to roles that reach the table through the Data API:
+
+```sql
+-- Minimum for app tables (adjust per table)
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.your_table TO authenticated, service_role;
+```
+
+- **`authenticated`**: browser client (`src/lib/*`) via anon key + user JWT.
+- **`service_role`**: Edge Functions (`supabase/functions/*`) using the service key.
+- **`anon`**: only when unauthenticated Data API access is intentional.
+
+3. **Functions** called via RPC: `GRANT EXECUTE ON FUNCTION … TO authenticated, service_role` (as needed).
+
+## Foreign keys and junction tables
+
+Inserts that reference another table run FK checks as the **caller**. If the caller cannot `SELECT` the referenced row (missing grant or RLS), Postgres returns `permission denied for table <referenced_table>`.
+
+- Grant + RLS on **both** sides of the relationship, or
+- Use a **`SECURITY DEFINER`** RPC (in the same migration) for writes that must bypass caller RLS on referenced rows.
+
+## Checklist (same migration)
+
+- [ ] `ENABLE ROW LEVEL SECURITY`
+- [ ] Policies for each role/operation the app uses
+- [ ] `GRANT` to `authenticated` and `service_role` (and `anon` only if required)
+- [ ] Edge Functions that `select` from the table can use `service_role`
+- [ ] Regenerate types: `npm run db:types` or `npm run db:types:local`
+
+Details and project-specific RLS: **`docs/database.md`**.
