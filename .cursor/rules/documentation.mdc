@@ -1,9 +1,15 @@
 ---
-description: How to write docs; index at documentation.md; same-change updates
+description: Read docs before work; index at documentation.md; same-change updates
 alwaysApply: true
 ---
 
 ## Documentation
+
+### Before work
+
+- **Read first**: Before **substantial work** or **exploring the codebase** (search, directory walks, broad file reads, Task/explore agents), open **`docs/documentation.md`** and read the **index row(s)** that match the task—or skim the full index when scope is unclear.
+- **Then** read the linked topic doc(s) before implementation, refactoring, or wide discovery.
+- **Narrow tasks** (single known file, one-line fix, question already answered by the user) may skip this when no index row applies.
 
 ### Using `docs/`
 
