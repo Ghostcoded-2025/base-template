@@ -1,3 +1,20 @@
+<script setup lang="ts">
+import { useSeoMeta } from '@unhead/vue'
+
+import { SEO_DEFAULTS, SEO_SITE_NAME } from '@/lib/seo'
+
+useSeoMeta({
+  title: SEO_SITE_NAME,
+  description:
+    'Starter shell for Vue 3 apps with auth, admin roles, and progressive web app install support.',
+  ogTitle: SEO_SITE_NAME,
+  ogDescription:
+    'Starter shell for Vue 3 apps with auth, admin roles, and progressive web app install support.',
+  ogImage: SEO_DEFAULTS.ogImage,
+  twitterCard: SEO_DEFAULTS.twitterCard,
+})
+</script>
+
 <template>
   <div class="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
     <div class="mx-auto w-full max-w-sm space-y-8 text-center">

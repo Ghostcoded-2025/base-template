@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { useSeoMeta } from '@unhead/vue'
 import { computed } from 'vue'
 
+import { SEO_DEFAULTS, SEO_SITE_NAME } from '@/lib/seo'
 import { useAccountStore } from '@/stores/account'
 import { useSessionStore } from '@/stores/session'
+
+useSeoMeta({
+  title: `Dashboard · ${SEO_SITE_NAME}`,
+  description: 'Your account dashboard.',
+  ogTitle: `Dashboard · ${SEO_SITE_NAME}`,
+  ogDescription: 'Your account dashboard.',
+  ogImage: SEO_DEFAULTS.ogImage,
+  twitterCard: SEO_DEFAULTS.twitterCard,
+})
 
 const sessionStore = useSessionStore()
 const accountStore = useAccountStore()

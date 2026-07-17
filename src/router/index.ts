@@ -1,6 +1,4 @@
 import {
-  createRouter,
-  createWebHistory,
   type Router,
   type RouteRecordRaw,
 } from 'vue-router'
@@ -30,7 +28,7 @@ export function replaceWithDashboardIfOnGuestAuthPath(r: Router): void {
   }
 }
 
-const routes: RouteRecordRaw[] = [
+export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
@@ -74,51 +72,56 @@ const routes: RouteRecordRaw[] = [
   },
 ]
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-})
-
-router.beforeEach(async (to) => {
-  if (publicPaths.has(to.path)) {
-    return true
-  }
-
-  if (guestAuthPathsRedirectWhenAuthenticated.has(to.path)) {
-    try {
-      const { data } = await authAPI.getCurrentUser()
-      if (data.user) {
-        return { path: '/dashboard', replace: true }
+export function setupRouterGuards(router: Router): void {
+  router.beforeEach(async (to) => {
+    if (import.meta.env.SSR) {
+      if (publicPaths.has(to.path)) {
+        return true
       }
-    } catch {
-      // Stay on auth pages if the session cannot be read.
-    }
-    return true
-  }
-
-  try {
-    const { data } = await authAPI.getCurrentUser()
-    if (!data.user) {
+      if (guestAuthPathsRedirectWhenAuthenticated.has(to.path)) {
+        return true
+      }
       return '/login'
     }
 
-    if (to.meta.requiresSuperAdmin) {
-      const allowed = await profileAPI.hasRole('super_admin')
-      if (!allowed) {
-        return '/admin'
-      }
-    } else if (to.meta.requiresAdmin) {
-      const isAdmin = await profileAPI.hasRole('admin')
-      const isSuper = await profileAPI.hasRole('super_admin')
-      if (!isAdmin && !isSuper) {
-        return '/dashboard'
-      }
+    if (publicPaths.has(to.path)) {
+      return true
     }
 
-    return true
-  } catch {
-    return '/login'
-  }
-})
+    if (guestAuthPathsRedirectWhenAuthenticated.has(to.path)) {
+      try {
+        const { data } = await authAPI.getCurrentUser()
+        if (data.user) {
+          return { path: '/dashboard', replace: true }
+        }
+      } catch {
+        // Stay on auth pages if the session cannot be read.
+      }
+      return true
+    }
 
-export default router
+    try {
+      const { data } = await authAPI.getCurrentUser()
+      if (!data.user) {
+        return '/login'
+      }
+
+      if (to.meta.requiresSuperAdmin) {
+        const allowed = await profileAPI.hasRole('super_admin')
+        if (!allowed) {
+          return '/admin'
+        }
+      } else if (to.meta.requiresAdmin) {
+        const isAdmin = await profileAPI.hasRole('admin')
+        const isSuper = await profileAPI.hasRole('super_admin')
+        if (!isAdmin && !isSuper) {
+          return '/dashboard'
+        }
+      }
+
+      return true
+    } catch {
+      return '/login'
+    }
+  })
+}

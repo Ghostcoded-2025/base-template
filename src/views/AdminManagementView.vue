@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import { useSeoMeta } from '@unhead/vue'
 import { onMounted, ref } from 'vue'
 
 import AdminManagePermissionsModal from '@/components/AdminManagePermissionsModal.vue'
 import { adminAPI, type AdminUserRow } from '@/lib/admin'
 import { authAPI } from '@/lib/auth'
+import { SEO_DEFAULTS, SEO_SITE_NAME } from '@/lib/seo'
 import { useSessionStore } from '@/stores/session'
+
+useSeoMeta({
+  title: `Admin management · ${SEO_SITE_NAME}`,
+  description: 'Search users and manage role assignments.',
+  ogTitle: `Admin management · ${SEO_SITE_NAME}`,
+  ogDescription: 'Search users and manage role assignments.',
+  ogImage: SEO_DEFAULTS.ogImage,
+  twitterCard: SEO_DEFAULTS.twitterCard,
+})
 
 const currentUserEmail = ref<string | null>(null)
 const users = ref<AdminUserRow[]>([])

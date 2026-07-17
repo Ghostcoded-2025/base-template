@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
+import ClientOnly from '@/components/ClientOnly.vue'
 import { authAPI } from '@/lib/auth'
 import {
   publicNavPaths,
@@ -19,7 +20,7 @@ const accountStore = useAccountStore()
 const { isAuthenticated, rolesLoaded, canAccessAdmin } =
   storeToRefs(sessionStore)
 
-const isLoading = ref(true)
+const isLoading = ref(!import.meta.env.SSR)
 
 const isLoginPage = computed(() => route.path === '/login')
 const isRegisterPage = computed(() => route.path === '/register')
@@ -59,6 +60,10 @@ async function applyAuthFromUser() {
 }
 
 onMounted(async () => {
+  if (import.meta.env.SSR) {
+    return
+  }
+
   await applyAuthFromUser()
   isLoading.value = false
 
@@ -130,13 +135,15 @@ const handleSignOut = async () => {
               App
             </router-link>
             <div class="flex items-center gap-4 text-sm">
-              <router-link
-                v-if="showInstallNavLink"
-                to="/install-app"
-                class="text-gray-600 hover:text-gray-900"
-              >
-                Install app
-              </router-link>
+              <ClientOnly>
+                <router-link
+                  v-if="showInstallNavLink"
+                  to="/install-app"
+                  class="text-gray-600 hover:text-gray-900"
+                >
+                  Install app
+                </router-link>
+              </ClientOnly>
               <router-link
                 to="/login"
                 class="text-gray-600 hover:text-gray-900"
@@ -159,13 +166,15 @@ const handleSignOut = async () => {
               >
                 Dashboard
               </router-link>
-              <router-link
-                v-if="showInstallNavLink"
-                to="/install-app"
-                class="text-gray-600 hover:text-gray-900"
-              >
-                Install app
-              </router-link>
+              <ClientOnly>
+                <router-link
+                  v-if="showInstallNavLink"
+                  to="/install-app"
+                  class="text-gray-600 hover:text-gray-900"
+                >
+                  Install app
+                </router-link>
+              </ClientOnly>
               <router-link
                 v-if="showAdminNav"
                 to="/admin"

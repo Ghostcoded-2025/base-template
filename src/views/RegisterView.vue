@@ -1,6 +1,17 @@
 <script setup lang="ts">
+import { useSeoMeta } from '@unhead/vue'
 import { ref } from 'vue'
 import { authAPI } from '@/lib/auth'
+import { SEO_DEFAULTS, SEO_SITE_NAME } from '@/lib/seo'
+
+useSeoMeta({
+  title: `Create account · ${SEO_SITE_NAME}`,
+  description: 'Create an account with email and password.',
+  ogTitle: `Create account · ${SEO_SITE_NAME}`,
+  ogDescription: 'Create an account with email and password.',
+  ogImage: SEO_DEFAULTS.ogImage,
+  twitterCard: SEO_DEFAULTS.twitterCard,
+})
 
 const email = ref('')
 const password = ref('')

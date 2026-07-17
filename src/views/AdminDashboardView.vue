@@ -1,8 +1,19 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { useSeoMeta } from '@unhead/vue'
 import { computed } from 'vue'
 
+import { SEO_DEFAULTS, SEO_SITE_NAME } from '@/lib/seo'
 import { useSessionStore } from '@/stores/session'
+
+useSeoMeta({
+  title: `Admin · ${SEO_SITE_NAME}`,
+  description: 'Admin tools and management pages.',
+  ogTitle: `Admin · ${SEO_SITE_NAME}`,
+  ogDescription: 'Admin tools and management pages.',
+  ogImage: SEO_DEFAULTS.ogImage,
+  twitterCard: SEO_DEFAULTS.twitterCard,
+})
 
 interface AdminPageCard {
   to: string

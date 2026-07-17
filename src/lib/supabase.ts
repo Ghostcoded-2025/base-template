@@ -9,10 +9,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
+const isBrowser = typeof window !== 'undefined'
+
+const noopStorage = {
+  getItem: () => null,
+  setItem: () => undefined,
+  removeItem: () => undefined,
+}
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
+    autoRefreshToken: isBrowser,
+    persistSession: isBrowser,
+    detectSessionInUrl: isBrowser,
+    storage: isBrowser ? window.localStorage : noopStorage,
   },
 })

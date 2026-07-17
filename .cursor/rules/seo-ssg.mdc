@@ -1,0 +1,31 @@
+---
+description: SEO and vite-ssg checklist when adding routes, views, or public pages
+globs: "{src/views/**,src/router/**,src/lib/seo.ts,src/lib/ssg-routes.ts,vite.config.ts}"
+alwaysApply: false
+---
+
+# SEO and vite-ssg
+
+Full maintenance guide: **`docs/seo.md`**. Read it before adding routes, views, or marketing pages.
+
+## New public page
+
+- [ ] `useSeoMeta` in the view (`title`, `description`, `ogTitle`, `ogDescription`, `ogImage`, `twitterCard`; defaults from `src/lib/seo.ts`)
+- [ ] Path in **`SSG_PUBLIC_PATHS`** (`src/lib/ssg-routes.ts`) — required for static HTML in `dist/`
+- [ ] Path in **`publicPaths`** (`src/router/index.ts`) if reachable when signed in
+- [ ] Rebuild; verify `dist/<path>.html` meta and body
+
+## New dynamic route (`:slug`, `:id`, …)
+
+- [ ] Implement fetch in **`fetchDynamicRoutePaths`** (`src/lib/ssg-routes.ts`); build must reach the data source
+- [ ] `useSeoMeta` with **`computed()`** from page data
+
+## Auth-only pages
+
+- `useSeoMeta` optional; do **not** add to `SSG_PUBLIC_PATHS` unless intentionally indexable.
+
+## Hard constraints
+
+- **`@unhead/vue` v2** only (vite-ssg peer); do not upgrade to v3 without upgrading vite-ssg
+- Set **`VITE_SITE_URL`** in deploy for absolute `og:image` at build time
+- Browser-only setup/render → **`<ClientOnly>`** or SSR guards (`import.meta.env.SSR`)

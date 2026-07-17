@@ -4,9 +4,9 @@
 
 **Pinia**: **Setup stores** only — `defineStore('id', () => { … })`, `ref` / `computed`, functions, single `return { … }`. In components: **`storeToRefs(store)`** for reactive state/getters; call **actions** on the store instance.
 
-**Router**: `RouteRecordRaw[]`, lazy views `() => import('…')`, extend **`RouteMeta`** in `env.d.ts` for new `meta` (e.g. `requiresAdmin`). Global **`beforeEach`**: **`/`** and **`/install-app`** are public for everyone (including signed-in users); authenticated users hitting **`/login`** or **`/register`** are redirected to **`/dashboard`** (via `authAPI.getCurrentUser()`). When auth changes **without** a navigation (Supabase listener), **`App.vue`** calls **`replaceWithDashboardIfOnGuestAuthPath`** from **`src/router/index.ts`** so login/register URLs stay aligned with the session.
+**Router**: `RouteRecordRaw[]`, lazy views `() => import('…')`, extend **`RouteMeta`** in `env.d.ts` for new `meta` (e.g. `requiresAdmin`). **`setupRouterGuards(router)`** in `src/router/index.ts` — wired from `ViteSSG` in `main.ts` (vite-ssg owns the router instance). Global **`beforeEach`**: **`/`** and **`/install-app`** are public for everyone (including signed-in users); authenticated users hitting **`/login`** or **`/register`** are redirected to **`/dashboard`** (via `authAPI.getCurrentUser()`). When auth changes **without** a navigation (Supabase listener), **`App.vue`** calls **`replaceWithDashboardIfOnGuestAuthPath`** from **`src/router/index.ts`** so login/register URLs stay aligned with the session.
 
-**Entry**: `createApp`, `createPinia`, `app.use(router)`.
+**Entry**: `ViteSSG` in `src/main.ts` (`export const createApp`), `createPinia`, Font Awesome registration in the setup callback. Production build: `vite-ssg build` (`build-only` script). **SEO / SSG**: adding or changing public routes, meta tags, or pre-render behavior → **`docs/seo.md`** (checklists, path lists, constraints).
 
 **`src/lib/`**: `supabase.ts` (client), `auth.ts` (session + guards), `profile.ts` (reads, owner `profiles` updates, role RPCs), `admin.ts` (Edge Function HTTP), `pwa.ts` (`isRunningAsInstalledPwa`, **`useShowInstallNavLink`** — installed detection + reactive nav flag via **`display-mode`** `matchMedia` `change`, for “open in app” without a full reload).
 

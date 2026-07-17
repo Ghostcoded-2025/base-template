@@ -1,7 +1,18 @@
 <script setup lang="ts">
+import { useSeoMeta } from '@unhead/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI } from '@/lib/auth'
+import { SEO_DEFAULTS, SEO_SITE_NAME } from '@/lib/seo'
+
+useSeoMeta({
+  title: `Sign in · ${SEO_SITE_NAME}`,
+  description: 'Sign in with your email and password.',
+  ogTitle: `Sign in · ${SEO_SITE_NAME}`,
+  ogDescription: 'Sign in with your email and password.',
+  ogImage: SEO_DEFAULTS.ogImage,
+  twitterCard: SEO_DEFAULTS.twitterCard,
+})
 
 const router = useRouter()
 
