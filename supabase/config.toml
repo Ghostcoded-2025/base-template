@@ -82,10 +82,10 @@ api_url = "http://127.0.0.1:54731"
 # OpenAI API Key to use for Supabase AI in the Supabase Studio.
 openai_api_key = "env(OPENAI_API_KEY)"
 
-# Email testing server (Mailpit/inbucket). Emails sent with the local dev setup are not actually sent - rather, they
+# Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
 # Access the web interface at http://localhost:54734
-[inbucket]
+[local_smtp]
 enabled = true
 # Port to use for the email testing server web interface.
 port = 54734
@@ -159,10 +159,10 @@ otp_length = 6
 otp_expiry = 3600
 
 # SMTP Configuration for Email Sending
-# 
-# For LOCAL DEVELOPMENT: Leave SMTP disabled to use inbucket (Mailpit) for email testing.
+#
+# For LOCAL DEVELOPMENT: Leave SMTP disabled to use [local_smtp] for email testing.
 # All emails will be captured and viewable at http://localhost:54734
-# 
+#
 # For PRODUCTION: Configure SMTP in Supabase Dashboard > Project Settings > Auth > SMTP Settings
 [auth.email.smtp]
 enabled = false

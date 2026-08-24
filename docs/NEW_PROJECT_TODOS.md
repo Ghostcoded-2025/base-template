@@ -31,11 +31,11 @@ This template uses a **manifest-only** PWA (no service worker). When you ship a 
 - **Local ports** — assign a dedicated block in `supabase/config.toml` when you copy the template (do not keep template defaults). Practical rules:
   - **Avoid `5184x` and `5473x`** — often already used by other local Supabase projects on the same machine.
   - **Avoid Windows excluded ranges** — especially `52884–52983`; run `netsh interface ipv4 show excludedportrange protocol=tcp` for the full list on your machine.
-  - **Pick a dedicated ~10-port block per project** — api, db, shadow, studio, inbucket, smtp, analytics, inspector, pooler; each `port =` must be unique within the project.
+  - **Pick a dedicated ~10-port block per project** — api, db, shadow, studio, local_smtp, smtp, analytics, inspector, pooler; each `port =` must be unique within the project.
   - **Align related settings** — e.g. `[studio].api_url` must match `[api].port`.
   - **Check before assigning** — `netstat -ano | Select-String "5410"` for collisions (adjust the pattern to your candidate block); `netsh interface ipv4 show excludedportrange protocol=tcp` for Windows blocks.
   - **Safe-ish zones** — gaps between excluded ranges on your machine (e.g. `54100–57571`), as long as you verify with `netstat` first.
-  - Search for `port =` and update: `[api].port` (and `[studio].api_url`), `[db].port`, `[db].shadow_port`, `[db.pooler].port` (if pooler enabled), `[studio].port`, `[inbucket].port` / `smtp_port`, `[analytics].port`, `[edge_runtime].inspector_port`.
+  - Search for `port =` and update: `[api].port` (and `[studio].api_url`), `[db].port`, `[db].shadow_port`, `[db.pooler].port` (if pooler enabled), `[studio].port`, `[local_smtp].port` / `smtp_port`, `[analytics].port`, `[edge_runtime].inspector_port`.
 - `**[auth].site_url`** and `**[auth].additional_redirect_urls**` — must match your dev server origin (default Vite is `http://localhost:5173`) and production URLs when you deploy.
 
 ## Environment variables
